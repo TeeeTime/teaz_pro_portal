@@ -1,0 +1,29 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Disables the trackpad "rubber-band" overscroll bounce at the top/bottom
+   of the page — scrolling just stops at the edge instead of springing
+   past it. Supported in Safari 16+, Chrome, Firefox. */
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  transition:
+    color var(--transition-medium),
+    background-color var(--transition-medium);
+  line-height: 1.6;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
