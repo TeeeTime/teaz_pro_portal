@@ -130,7 +130,7 @@ matters.
 ## Frontend conventions
 
 - **Visual style**: simple over decorative, functionality/usability first —
-  no rounded corners, no emoji (a small hand-drawn SVG icon set instead),
+  no rounded corners, no emoji (Lucide icons via a name-based wrapper instead),
   IBM Plex Sans as the house typeface, every layout designed to work at
   mobile widths and at a half-desktop-screen width, not just full desktop.
   This applies to every app, not just portal. Full guide, including the
