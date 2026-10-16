@@ -184,9 +184,22 @@ To test against the real Keycloak from your machine, add
 `http://localhost:5173/*` and `http://localhost:5173` to the client
 temporarily and run `npm run dev -- --mode production`.
 
-## Deployment (planned, not yet built)
+## Deployment
 
-Target shape for when any app actually needs deploying:
+Portal deploys with `compose.yml` at the repo root. On the VPS:
+
+```sh
+git pull && docker compose up -d --build
+```
+
+- `frontend/Dockerfile`: `npm run build` (bakes in `.env.production`),
+  served by nginx with an SPA fallback (`frontend/nginx.conf`).
+- `backend/Dockerfile`: Spring Boot jar, run with `SPRING_PROFILES_ACTIVE=prod`.
+- Traefik routes `portal.teaz.pro` to the frontend and
+  `portal.teaz.pro/api/*` to the backend (same origin, so no CORS needed).
+  It expects the external Docker network `proxy` and the cert resolver `le`.
+
+Shape shared by every app:
 
 - One server hosts every app in the ecosystem.
 - Each app gets its own subdomain (e.g. `portal.teaz.pro`,
@@ -201,7 +214,4 @@ Target shape for when any app actually needs deploying:
   links out to other apps). A database, if needed, belongs to that app's own
   compose file, not a shared instance.
 
-This was prototyped once for portal (Dockerfiles + a 3-file compose split
-for local/prod) and deliberately removed — don't rebuild it until an app is
-actually being deployed. Local dev should stay Docker-free regardless of
-how deployment ends up looking.
+Docker is for deployment only. Local dev stays Docker-free.
