@@ -155,20 +155,34 @@ matters.
 
 ## Auth
 
-Login/access is a separate, dedicated app/entry point in the ecosystem —
-individual apps like portal don't implement their own login screen. Until
-that app (backed by Keycloak) exists, secure pages/endpoints with a mock
-auth layer instead of skipping auth entirely or wiring a premature real
-integration:
+Login goes through the shared Keycloak at `https://auth.teaz.pro`, realm
+`teazpro`. Apps never build their own login screen; they redirect to
+Keycloak's hosted login page. Local dev stays offline and login-free via a
+mock, and prod uses the real integration. Both sit behind the same interface:
 
-- Frontend: a stub auth guard/composable standing in for "is logged in /
-  who is the user" — isolated so it's a clean swap for the real Keycloak
-  client later.
-- Backend: a permissive/stub Spring Security config playing the same role
-  for API endpoints.
+- **Frontend** (`frontend/src/auth/`): components only call `useAuth()`
+  (`user`, `logout()`, `getToken()`). `index.ts` picks `keycloakAuth.ts`
+  when `VITE_KEYCLOAK_URL` is set, otherwise `mockAuth.ts`.
+  `.env.production` sets it, so `npm run build` gets Keycloak and
+  `npm run dev` gets the mock. Keycloak runs in `login-required` mode with
+  PKCE: the app only mounts after a successful login.
+- **Backend** (`backend/.../security/`): with the `prod` Spring profile,
+  `SecurityConfig` makes every request require a Keycloak Bearer JWT
+  (issuer from `application-prod.properties`). Without it,
+  `MockSecurityConfig` permits everything.
 
-Keep the mock clearly labeled (e.g. `mockAuth`/`MockSecurityConfig`) so it's
-easy to find and rip out.
+Keycloak client setup for an app (Clients → Create client in realm `teazpro`):
+
+- Client ID = app name (`portal`), **Client authentication off** (public
+  client), only **Standard flow** enabled.
+- Advanced → **PKCE Method `S256`**.
+- Valid redirect URIs `https://<app>.teaz.pro/*`, Valid post logout
+  redirect URIs `https://<app>.teaz.pro/*`, Web origins
+  `https://<app>.teaz.pro`.
+
+To test against the real Keycloak from your machine, add
+`http://localhost:5173/*` and `http://localhost:5173` to the client
+temporarily and run `npm run dev -- --mode production`.
 
 ## Deployment (planned, not yet built)
 
