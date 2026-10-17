@@ -2,7 +2,8 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# git: @teeetime/teaz-pro-ui is a GitHub dependency, built by npm on install.
+RUN apk add --no-cache git && npm ci
 COPY . .
 RUN npm run build
 

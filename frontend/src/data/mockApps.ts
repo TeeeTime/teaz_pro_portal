@@ -1,26 +1,10 @@
-export interface AppStat {
-  value: string
-  deltaLabel: string
-  deltaGood: boolean
-  /** 12-point trend, oldest first. */
-  trend: number[]
-}
-
-export interface AgendaEvent {
-  time: string
-  title: string
-}
-
-export interface StatusRow {
-  label: string
-  state: 'good' | 'warning' | 'critical'
-}
+import type { AgendaEvent, AppStat, StatusRow } from '@teeetime/teaz-pro-ui'
 
 export interface EcosystemApp {
   id: string
   name: string
   description: string
-  /** Name of an icon defined in components/icons/Icon.vue — never an emoji. */
+  /** Name of an icon from teaz_pro_ui's Icon component — never an emoji. */
   icon: string
   href: string
   colSpan?: number

@@ -19,11 +19,14 @@ Or use the IntelliJ run configs in `.idea/runConfigurations/`:
 **Run All (Frontend + Backend)**. Locally, auth is mocked on both sides, so
 no Keycloak is needed.
 
-## Theme tokens
+## Shared UI
 
-`frontend/src/styles/themes.css` is a copy of
-`teaz_pro/tokens/themes.css`. Change the tokens there, then copy the
-file here again.
+`TopBar`, `GridLayout`/`GridItem`, `Icon`, the dashboard tiles, `useTheme()`
+and the theme tokens come from **`teaz_pro_ui`**
+(`@teeetime/teaz-pro-ui`, installed from GitHub, pinned to a tag in
+`frontend/package.json`). Only portal-specific pieces stay here
+(`QuickFormTile`, the mock data, the dashboard view). To pick up a new
+release, bump the `#v<version>` and run `npm install`.
 
 ## Auth
 

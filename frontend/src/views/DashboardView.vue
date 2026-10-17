@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import GridLayout from '@/components/grid/GridLayout.vue'
-import GridItem from '@/components/grid/GridItem.vue'
-import AppTile from '@/components/dashboard/AppTile.vue'
-import StatSparklineTile from '@/components/dashboard/StatSparklineTile.vue'
-import AgendaTile from '@/components/dashboard/AgendaTile.vue'
+import {
+  AgendaTile,
+  AppTile,
+  GridItem,
+  GridLayout,
+  SearchFieldTile,
+  StatSparklineTile,
+  StatusListTile,
+} from '@teeetime/teaz-pro-ui'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
-import SearchFieldTile from '@/components/dashboard/SearchFieldTile.vue'
-import StatusListTile from '@/components/dashboard/StatusListTile.vue'
 import { mockApps } from '@/data/mockApps'
 
 function openApp(href: string) {
@@ -42,7 +44,7 @@ function openApp(href: string) {
         <StatSparklineTile v-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
         <AgendaTile v-else-if="app.variant === 'agenda' && app.events" :icon="app.icon" :name="app.name" :events="app.events" />
         <QuickFormTile v-else-if="app.variant === 'form'" :icon="app.icon" :name="app.name" />
-        <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" />
+        <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" placeholder="Search ecosystem…" />
         <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="app.statuses" />
         <AppTile
           v-else
