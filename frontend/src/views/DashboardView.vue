@@ -10,6 +10,10 @@ import {
 } from '@teeetime/teaz-pro-ui'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
 import { mockApps } from '@/data/mockApps'
+import { usePulseStatuses } from '@/data/pulseHealth'
+
+// Live from Teaz Pulse in builds; null in dev, where the mock rows stay.
+const pulseStatuses = usePulseStatuses()
 
 function openApp(href: string) {
   if (href === '#') return
@@ -45,7 +49,7 @@ function openApp(href: string) {
         <AgendaTile v-else-if="app.variant === 'agenda' && app.events" :icon="app.icon" :name="app.name" :events="app.events" />
         <QuickFormTile v-else-if="app.variant === 'form'" :icon="app.icon" :name="app.name" />
         <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" placeholder="Search ecosystem…" />
-        <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="app.statuses" />
+        <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="pulseStatuses ?? app.statuses" />
         <AppTile
           v-else
           :icon="app.icon"

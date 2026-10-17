@@ -28,6 +28,14 @@ and the theme tokens come from **`teaz_pro_ui`**
 (`QuickFormTile`, the mock data, the dashboard view). To pick up a new
 release, bump the `#v<version>` and run `npm install`.
 
+## Status tile
+
+The dashboard's Status tile shows every app's health from Teaz Pulse
+(`GET https://pulse.teaz.pro/api/health` with the user's token, refreshed
+every minute, worst first). Set by `VITE_PULSE_URL` in `.env.production`;
+in `npm run dev` it's unset and the tile shows mock rows. Pulse must list
+`https://portal.teaz.pro` in `pulse.cors.allowed-origins` (it does).
+
 ## Auth
 
 - Frontend `frontend/src/auth/`: Keycloak (`.env.production`: `auth.teaz.pro`,

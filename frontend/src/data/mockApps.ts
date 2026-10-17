@@ -78,7 +78,7 @@ export const mockApps: EcosystemApp[] = [
     name: 'Status',
     description: 'Service health and uptime.',
     icon: 'pulse',
-    href: '#',
+    href: 'https://pulse.teaz.pro',
     variant: 'status',
     statuses: [
       { label: 'API', state: 'good' },
