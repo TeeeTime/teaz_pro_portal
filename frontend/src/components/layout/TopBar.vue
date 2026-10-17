@@ -15,7 +15,7 @@ export interface TopBarProps {
 
 /*
  * Meant to be reused as-is across every app in the ecosystem — see
- * teaz_pro_assets/docs/STYLE_GUIDE.md. The default slot on the left is where an
+ * teaz_pro/docs/STYLE_GUIDE.md. The default slot on the left is where an
  * app would put its own branding/name, so this component carries no
  * portal-specific content. Theme cycling lives here (not as a prop/slot)
  * specifically so every app gets working, consistent theme switching for

@@ -24,7 +24,7 @@ import {
 
 /*
  * House icon set, on top of lucide-vue (@lucide/vue) — see
- * teaz_pro_assets/docs/STYLE_GUIDE.md. The name-based API below is unchanged from
+ * teaz_pro/docs/STYLE_GUIDE.md. The name-based API below is unchanged from
  * the hand-drawn set this replaced, so no call site (mockApps.ts, any
  * tile component) needed to change — only this lookup's internals did.
  *
