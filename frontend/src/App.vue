@@ -15,16 +15,10 @@ function onMenuSelect(item: TopBarMenuItem) {
 </script>
 
 <template>
-  <TopBar :user-name="auth.user.value?.name" @select="onMenuSelect">
-    <span class="app-name">Teaz Portal</span>
-  </TopBar>
+  <TopBar
+    app-name="Portal"
+    :user-name="auth.user.value?.name"
+    @select="onMenuSelect"
+  />
   <DashboardView />
 </template>
-
-<style scoped>
-.app-name {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-</style>
