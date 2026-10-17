@@ -26,7 +26,9 @@ and the theme tokens come from **`teaz_pro_ui`**
 (`@teeetime/teaz-pro-ui`, installed from GitHub, pinned to a tag in
 `frontend/package.json`). Only portal-specific pieces stay here
 (`QuickFormTile`, the mock data, the dashboard view). To pick up a new
-release, bump the `#v<version>` and run `npm install`.
+release: `npm install github:TeeeTime/teaz_pro_ui#v<version>` in
+`frontend/` (editing the tag and running a plain `npm install` keeps the
+old version from the lock file).
 
 ## Status tile
 

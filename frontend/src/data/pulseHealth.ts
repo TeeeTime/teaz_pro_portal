@@ -18,8 +18,8 @@ const SEVERITY: Record<StatusRow['state'], number> = { critical: 0, warning: 1, 
  * minute. Returns null when VITE_PULSE_URL is unset (plain `npm run dev`),
  * so the tile keeps its mock rows, like the mock auth.
  *
- * Rows are sorted worst first: the tile has room for a handful of rows and
- * clips the rest, so problems must never be the part that gets clipped.
+ * Rows are sorted worst first, so problems are always on the tile's first
+ * page when the list needs paging.
  */
 export function usePulseStatuses(): Ref<StatusRow[] | null> {
   const pulseUrl = import.meta.env.VITE_PULSE_URL
@@ -35,7 +35,12 @@ export function usePulseStatuses(): Ref<StatusRow[] | null> {
       if (!response.ok) throw new Error(`${response.status}`)
       const health: PulseHealth = await response.json()
       statuses.value = health.apps
-        .map((app) => ({ label: app.name, state: app.status }))
+        .map((app) => ({
+          label: app.name,
+          state: app.status,
+          // Running/total only where an app has several containers (e.g. frontend + backend).
+          detail: app.total > 1 ? `(${app.running}/${app.total})` : undefined,
+        }))
         .sort((a, b) => SEVERITY[a.state] - SEVERITY[b.state])
     } catch (error) {
       console.warn('Pulse health not available', error)

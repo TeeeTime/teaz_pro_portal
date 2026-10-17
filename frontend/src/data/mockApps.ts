@@ -44,6 +44,27 @@ export const mockApps: EcosystemApp[] = [
   },
   { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
   { id: 'billing', name: 'Billing', description: 'Invoices and payment history.', icon: 'card', href: '#' },
+  /*
+   * Placed right after billing so dense flow puts it in the last column,
+   * spanning the first two rows. Live rows come from Teaz Pulse in builds
+   * (see pulseHealth.ts); these mock rows only show in npm run dev.
+   */
+  {
+    id: 'status',
+    name: 'Status',
+    description: 'Service health and uptime.',
+    icon: 'pulse',
+    href: 'https://pulse.teaz.pro',
+    rowSpan: 2,
+    variant: 'status',
+    statuses: [
+      { label: 'Demo', state: 'critical', detail: '(0/1)' },
+      { label: 'Teaz Portal', state: 'warning', detail: '(2/2)' },
+      { label: 'Keycloak', state: 'good', detail: '(2/2)' },
+      { label: 'Teaz Pulse', state: 'good', detail: '(3/3)' },
+      { label: 'Traefik', state: 'good' },
+    ],
+  },
   { id: 'crm', name: 'CRM', description: 'Customer relationships and leads.', icon: 'person', href: '#' },
   {
     id: 'scheduler',
@@ -74,31 +95,11 @@ export const mockApps: EcosystemApp[] = [
   { id: 'admin', name: 'Admin', description: 'User and role management.', icon: 'shield', href: '#' },
   { id: 'settings', name: 'Settings', description: 'Ecosystem-wide configuration.', icon: 'gear', href: '#' },
   {
-    id: 'status',
-    name: 'Status',
-    description: 'Service health and uptime.',
-    icon: 'pulse',
-    href: 'https://pulse.teaz.pro',
-    variant: 'status',
-    statuses: [
-      { label: 'API', state: 'good' },
-      { label: 'Database', state: 'good' },
-      { label: 'Queue', state: 'warning' },
-    ],
-  },
-  {
     id: 'search',
     name: 'Search',
     description: 'Find anything across the ecosystem.',
     icon: 'search',
     href: '#',
     variant: 'search',
-  },
-  {
-    id: 'notifications',
-    name: 'Notifications',
-    description: 'Cross-app alerts and activity.',
-    icon: 'bell',
-    href: '#',
   },
 ]
