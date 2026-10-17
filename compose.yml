@@ -11,6 +11,8 @@ services:
       - traefik.http.routers.portal.rule=Host(`portal.teaz.pro`)
       - traefik.http.routers.portal.tls.certresolver=le
       - traefik.http.services.portal.loadbalancer.server.port=80
+      # Shown and controllable in Teaz Pulse.
+      - pro.teaz.pulse.app=Teaz Portal
 
   backend:
     build: ./backend
@@ -24,6 +26,7 @@ services:
       - traefik.http.routers.portal-api.rule=Host(`portal.teaz.pro`) && PathPrefix(`/api`)
       - traefik.http.routers.portal-api.tls.certresolver=le
       - traefik.http.services.portal-api.loadbalancer.server.port=8080
+      - pro.teaz.pulse.app=Teaz Portal
 
 networks:
   proxy:
