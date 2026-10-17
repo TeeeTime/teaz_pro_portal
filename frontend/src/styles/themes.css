@@ -1,3 +1,5 @@
+/* Copy of teaz_pro_assets/tokens/themes.css. Change it there, then copy it here. */
+
 /*
  * Color scheme tokens.
  *
@@ -6,9 +8,12 @@
  * component tree support every theme below, and what lets a future theme be
  * added without touching component code.
  *
- * See frontend/docs/COLOR_SCHEMES.md for the full token reference and the
- * checklist to follow when adding a new theme or a new themed component.
- * See frontend/docs/STYLE_GUIDE.md for the house styling rules (sharp
+ * Source of truth: teaz_pro_assets/tokens/themes.css. Apps and the Keycloak
+ * login theme keep verbatim copies; change this file first, then copy it.
+ *
+ * See teaz_pro_assets/docs/COLOR_SCHEMES.md for the full token reference and
+ * the checklist to follow when adding a new theme or a new themed component.
+ * See teaz_pro_assets/docs/STYLE_GUIDE.md for the house styling rules (sharp
  * corners, no emoji iconography, typography, responsive-first) these tokens
  * exist to enforce consistently across every app in the ecosystem.
  */
@@ -22,7 +27,7 @@
   --transition-fast: 150ms ease;
   --transition-medium: 250ms ease;
 
-  /* House typeface. See STYLE_GUIDE.md — IBM Plex Sans, loaded in index.html. */
+  /* House typeface. See STYLE_GUIDE.md — IBM Plex Sans, loaded by each consumer (Google Fonts). */
   --font-sans:
     'IBM Plex Sans',
     -apple-system,

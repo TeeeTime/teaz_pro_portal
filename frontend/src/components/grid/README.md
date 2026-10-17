@@ -134,7 +134,7 @@ actual geometry).
 ### Styling
 
 All colors come from the CSS custom properties defined in
-`src/styles/themes.css` (see `frontend/docs/COLOR_SCHEMES.md`). Nothing in
+`src/styles/themes.css` (see `teaz_pro_assets/docs/COLOR_SCHEMES.md`). Nothing in
 either component hardcodes a color — that's what makes them theme-agnostic.
 If this pair moves to its own package, `themes.css` (or an equivalent token
 set) has to move with it, or be provided by the consuming app.
