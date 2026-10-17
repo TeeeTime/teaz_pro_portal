@@ -38,6 +38,16 @@ every minute, worst first). Set by `VITE_PULSE_URL` in `.env.production`;
 in `npm run dev` it's unset and the tile shows mock rows. Pulse must list
 `https://portal.teaz.pro` in `pulse.cors.allowed-origins` (it does).
 
+## Study tile
+
+Top row, next to Inventory: the learner's Study courses with progress in
+percent, from `GET https://study.teaz.pro/api/overview` (refreshed every 5
+minutes). Set by `VITE_STUDY_URL` in `.env.production`; in `npm run dev` the
+tile shows mock rows. Users without the realm role `study-user` get a
+non-clickable "no access" tile instead, and portal doesn't call Study for
+them. Study must list `https://portal.teaz.pro` in
+`study.cors.allowed-origins` (it does).
+
 ## Auth
 
 - Frontend `frontend/src/auth/`: Keycloak (`.env.production`: `auth.teaz.pro`,

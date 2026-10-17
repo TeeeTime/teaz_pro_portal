@@ -1,4 +1,4 @@
-import type { AgendaEvent, AppStat, StatusRow } from '@teeetime/teaz-pro-ui'
+import type { AgendaEvent, AppStat, ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
 
 export interface EcosystemApp {
   id: string
@@ -15,16 +15,22 @@ export interface EcosystemApp {
    * is a preview of the kind of richer content a real app might surface on
    * its dashboard tile — still presentational only, no logic/fetching.
    */
-  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status'
+  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status' | 'progress'
   stat?: AppStat
   events?: AgendaEvent[]
   statuses?: StatusRow[]
+  progress?: ProgressRow[]
   /**
-   * Keycloak realm role needed to open the app. Without it the tile is
-   * still shown, just not clickable. Purely cosmetic: the app itself
-   * enforces the role.
+   * Keycloak realm role needed to open the app. Purely cosmetic: the app
+   * itself enforces the role.
    */
   requiredRole?: string
+  /**
+   * Without requiredRole: 'show' (default) keeps the tile's content, just not
+   * clickable (Status: health is public). 'locked' replaces it with a
+   * NoAccessTile (Study: the content is the user's own data in that app).
+   */
+  withoutRole?: 'show' | 'locked'
 }
 
 /**
@@ -49,9 +55,27 @@ export const mockApps: EcosystemApp[] = [
     },
   },
   { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
-  { id: 'billing', name: 'Billing', description: 'Invoices and payment history.', icon: 'card', href: '#' },
   /*
-   * Placed right after billing so dense flow puts it in the last column,
+   * Live rows from Study's /api/overview in builds (see studyOverview.ts);
+   * these mock rows only show in npm run dev.
+   */
+  {
+    id: 'study',
+    name: 'Study',
+    description: 'Your courses and learning progress.',
+    icon: 'study',
+    href: 'https://study.teaz.pro',
+    variant: 'progress',
+    requiredRole: 'study-user',
+    withoutRole: 'locked',
+    progress: [
+      { label: 'Operations Research', percent: 64 },
+      { label: 'Lineare Algebra', percent: 12 },
+      { label: 'Statistik II', percent: 0 },
+    ],
+  },
+  /*
+   * Placed right after study so dense flow puts it in the last column,
    * spanning the first two rows. Live rows come from Teaz Pulse in builds
    * (see pulseHealth.ts); these mock rows only show in npm run dev.
    */
@@ -67,9 +91,9 @@ export const mockApps: EcosystemApp[] = [
     variant: 'status',
     statuses: [
       { label: 'Demo', state: 'critical', detail: '(0/1)' },
-      { label: 'Teaz Portal', state: 'warning', detail: '(2/2)' },
+      { label: 'Portal', state: 'warning', detail: '(2/2)' },
       { label: 'Keycloak', state: 'good', detail: '(2/2)' },
-      { label: 'Teaz Pulse', state: 'good', detail: '(3/3)' },
+      { label: 'Pulse', state: 'good', detail: '(3/3)' },
       { label: 'Traefik', state: 'good' },
     ],
   },

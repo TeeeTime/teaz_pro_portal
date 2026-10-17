@@ -4,6 +4,8 @@ import {
   AppTile,
   GridItem,
   GridLayout,
+  NoAccessTile,
+  ProgressListTile,
   SearchFieldTile,
   StatSparklineTile,
   StatusListTile,
@@ -12,15 +14,22 @@ import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
 import { mockApps } from '@/data/mockApps'
 import type { EcosystemApp } from '@/data/mockApps'
 import { usePulseStatuses } from '@/data/pulseHealth'
+import { useStudyCourses } from '@/data/studyOverview'
 import { useAuth } from '@/auth'
 
 // Live from Teaz Pulse in builds; null in dev, where the mock rows stay.
 const pulseStatuses = usePulseStatuses()
+// Live from Study in builds (if the user has its role); null in dev.
+const studyCourses = useStudyCourses('study-user')
 
 const auth = useAuth()
 
 function canOpen(app: EcosystemApp): boolean {
   return !app.requiredRole || (auth.user.value?.roles.includes(app.requiredRole) ?? false)
+}
+
+function locked(app: EcosystemApp): boolean {
+  return app.withoutRole === 'locked' && !canOpen(app)
 }
 
 function openApp(href: string) {
@@ -54,11 +63,19 @@ function openApp(href: string) {
         :aria-label="app.name"
         @click="canOpen(app) && openApp(app.href)"
       >
-        <StatSparklineTile v-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
+        <NoAccessTile v-if="locked(app)" :icon="app.icon" :name="app.name" />
+        <StatSparklineTile v-else-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
         <AgendaTile v-else-if="app.variant === 'agenda' && app.events" :icon="app.icon" :name="app.name" :events="app.events" />
         <QuickFormTile v-else-if="app.variant === 'form'" :icon="app.icon" :name="app.name" />
         <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" placeholder="Search ecosystem…" />
         <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="pulseStatuses ?? app.statuses" />
+        <ProgressListTile
+          v-else-if="app.variant === 'progress' && app.progress"
+          :icon="app.icon"
+          :name="app.name"
+          :items="studyCourses?.rows ?? app.progress"
+          :empty-text="studyCourses?.emptyText"
+        />
         <AppTile
           v-else
           :icon="app.icon"

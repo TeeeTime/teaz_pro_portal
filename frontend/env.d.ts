@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_KEYCLOAK_CLIENT_ID: string
   /** Teaz Pulse base URL, e.g. https://pulse.teaz.pro. Unset = mock rows in the status tile. */
   readonly VITE_PULSE_URL?: string
+  /** Teaz Study base URL, e.g. https://study.teaz.pro. Unset = mock rows in the Study tile. */
+  readonly VITE_STUDY_URL?: string
 }
 
 interface ImportMeta {

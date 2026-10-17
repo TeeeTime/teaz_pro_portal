@@ -16,7 +16,7 @@ export function createMockAuth(): AuthService {
         name: 'Jordan Lee',
         username: 'jlee',
         email: 'jordan.lee@example.com',
-        roles: ['pulse-admin'],
+        roles: ['pulse-admin', 'study-user'],
       }
     },
     async logout() {
