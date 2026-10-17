@@ -19,6 +19,12 @@ export interface EcosystemApp {
   stat?: AppStat
   events?: AgendaEvent[]
   statuses?: StatusRow[]
+  /**
+   * Keycloak realm role needed to open the app. Without it the tile is
+   * still shown, just not clickable. Purely cosmetic: the app itself
+   * enforces the role.
+   */
+  requiredRole?: string
 }
 
 /**
@@ -55,6 +61,8 @@ export const mockApps: EcosystemApp[] = [
     description: 'Service health and uptime.',
     icon: 'pulse',
     href: 'https://pulse.teaz.pro',
+    // Pulse's container view needs it; the health rows here don't.
+    requiredRole: 'pulse-admin',
     rowSpan: 2,
     variant: 'status',
     statuses: [

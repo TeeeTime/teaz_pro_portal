@@ -28,6 +28,7 @@ export function createKeycloakAuth(settings: KeycloakSettings): AuthService {
       name: (token.name as string | undefined) ?? username,
       username,
       email: token.email as string | undefined,
+      roles: token.realm_access?.roles ?? [],
     }
   }
 

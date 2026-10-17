@@ -10,10 +10,18 @@ import {
 } from '@teeetime/teaz-pro-ui'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
 import { mockApps } from '@/data/mockApps'
+import type { EcosystemApp } from '@/data/mockApps'
 import { usePulseStatuses } from '@/data/pulseHealth'
+import { useAuth } from '@/auth'
 
 // Live from Teaz Pulse in builds; null in dev, where the mock rows stay.
 const pulseStatuses = usePulseStatuses()
+
+const auth = useAuth()
+
+function canOpen(app: EcosystemApp): boolean {
+  return !app.requiredRole || (auth.user.value?.roles.includes(app.requiredRole) ?? false)
+}
 
 function openApp(href: string) {
   if (href === '#') return
@@ -33,7 +41,8 @@ function openApp(href: string) {
       with real embedded controls (form, search) stop click/keydown
       propagation around just those controls so interacting with them
       doesn't also trigger the card's own "navigate" activation; see each
-      component for that handling.
+      component for that handling. The one exception: an app with a
+      requiredRole the user lacks stays visible but isn't clickable.
     -->
     <GridLayout :columns="5" :gap="16">
       <GridItem
@@ -41,9 +50,9 @@ function openApp(href: string) {
         :key="app.id"
         :col-span="app.colSpan"
         :row-span="app.rowSpan"
-        clickable
+        :clickable="canOpen(app)"
         :aria-label="app.name"
-        @click="openApp(app.href)"
+        @click="canOpen(app) && openApp(app.href)"
       >
         <StatSparklineTile v-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
         <AgendaTile v-else-if="app.variant === 'agenda' && app.events" :icon="app.icon" :name="app.name" :events="app.events" />

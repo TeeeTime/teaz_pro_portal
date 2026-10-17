@@ -4,6 +4,8 @@ export interface AuthUser {
   name: string
   username: string
   email?: string
+  /** Keycloak realm roles (realm_access.roles). For showing/hiding UI only; backends enforce them. */
+  roles: readonly string[]
 }
 
 /*
