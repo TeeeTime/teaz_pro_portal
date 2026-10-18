@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_PULSE_URL?: string
   /** Teaz Study base URL, e.g. https://study.teaz.pro. Unset = mock rows in the Study tile. */
   readonly VITE_STUDY_URL?: string
+  /** Teaz Transit base URL, e.g. https://transit.teaz.pro. Unset = mock rows in the Transit tile. */
+  readonly VITE_TRANSIT_URL?: string
 }
 
 interface ImportMeta {

@@ -11,16 +11,20 @@ import {
   StatusListTile,
 } from '@teeetime/teaz-pro-ui'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
+import TransitTile from '@/components/dashboard/TransitTile.vue'
 import { mockApps } from '@/data/mockApps'
 import type { EcosystemApp } from '@/data/mockApps'
 import { usePulseStatuses } from '@/data/pulseHealth'
 import { useStudyCourses } from '@/data/studyOverview'
+import { useTransitBoard } from '@/data/transitBoard'
 import { useAuth } from '@/auth'
 
 // Live from Teaz Pulse in builds; null in dev, where the mock rows stay.
 const pulseStatuses = usePulseStatuses()
 // Live from Study in builds (if the user has its role); null in dev.
 const studyCourses = useStudyCourses('study-user')
+// Live from Transit in builds; null in dev.
+const transitBoard = useTransitBoard()
 
 const auth = useAuth()
 
@@ -75,6 +79,12 @@ function openApp(href: string) {
           :name="app.name"
           :items="studyCourses?.rows ?? app.progress"
           :empty-text="studyCourses?.emptyText"
+        />
+        <TransitTile
+          v-else-if="app.variant === 'transit' && app.transit"
+          :icon="app.icon"
+          :name="app.name"
+          :board="transitBoard ?? app.transit"
         />
         <AppTile
           v-else

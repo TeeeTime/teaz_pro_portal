@@ -48,6 +48,19 @@ non-clickable "no access" tile instead, and portal doesn't call Study for
 them. Study must list `https://portal.teaz.pro` in
 `study.cors.allowed-origins` (it does).
 
+## Transit tile
+
+Second row, fourth column (1x1): the user's stop and its next departures
+from `GET https://transit.teaz.pro/api/board` (refreshed every minute), as
+many as fit the tile, with delays and cancellations and the data
+attribution the license asks for. Users without a stop get "Pick your stop
+in Transit."; the tile opens Transit. Set by `VITE_TRANSIT_URL` in
+`.env.production`; in `npm run dev` the tile shows mock rows. No role
+needed. Transit must list `https://portal.teaz.pro` in
+`transit.cors.allowed-origins` (it does). The tile
+(`components/dashboard/TransitTile.vue`) stays in portal, as it knows
+Transit's data.
+
 ## Auth
 
 - Frontend `frontend/src/auth/`: Keycloak (`.env.production`: `auth.teaz.pro`,

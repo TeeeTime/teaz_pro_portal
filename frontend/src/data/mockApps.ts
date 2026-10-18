@@ -1,4 +1,5 @@
 import type { AgendaEvent, AppStat, ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
+import type { TransitBoard } from '@/data/transitBoard'
 
 export interface EcosystemApp {
   id: string
@@ -15,11 +16,12 @@ export interface EcosystemApp {
    * is a preview of the kind of richer content a real app might surface on
    * its dashboard tile — still presentational only, no logic/fetching.
    */
-  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status' | 'progress'
+  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status' | 'progress' | 'transit'
   stat?: AppStat
   events?: AgendaEvent[]
   statuses?: StatusRow[]
   progress?: ProgressRow[]
+  transit?: TransitBoard
   /**
    * Keycloak realm role needed to open the app. Purely cosmetic: the app
    * itself enforces the role.
@@ -111,7 +113,32 @@ export const mockApps: EcosystemApp[] = [
       { time: '14:30', title: 'Client call' },
     ],
   },
-  { id: 'support', name: 'Support Desk', description: 'Customer support tickets.', icon: 'headset', href: '#' },
+  /*
+   * Second row, fourth column: Scheduler (2 wide) doesn't fit there, so dense
+   * flow fills the gap with this 1x1 tile. Live departures come from Teaz
+   * Transit in builds (see transitBoard.ts); these mock rows only show in npm
+   * run dev.
+   */
+  {
+    id: 'transit',
+    name: 'Transit',
+    description: 'Next departures at your stop.',
+    icon: 'calendar',
+    href: 'https://transit.teaz.pro',
+    variant: 'transit',
+    transit: {
+      station: 'Münster Hauptbahnhof',
+      departures: [
+        { key: '1', time: '08:04', line: 'RE 7', destination: 'Krefeld Hbf', delay: 3 },
+        { key: '2', time: '08:06', line: '11', destination: 'Tannenhof' },
+        { key: '3', time: '08:09', line: 'RB 66', destination: 'Osnabrück Hbf', canceled: true },
+        { key: '4', time: '08:12', line: 'S75', destination: 'Bocholt, Bustreff' },
+        { key: '5', time: '08:15', line: 'ICE 41', destination: 'Dortmund Hbf' },
+      ],
+      emptyText: 'Pick your stop in Transit.',
+      attribution: 'Sample data',
+    },
+  },
   { id: 'docs', name: 'Docs', description: 'Internal documentation.', icon: 'docs', href: '#' },
   { id: 'messaging', name: 'Messaging', description: 'Team chat and notifications.', icon: 'chat', href: '#' },
   {
