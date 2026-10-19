@@ -61,6 +61,26 @@ needed. Transit must list `https://portal.teaz.pro` in
 (`components/dashboard/TransitTile.vue`) stays in portal, as it knows
 Transit's data.
 
+## Fitness tiles
+
+Two tiles from Teaz Fitness (the user's Strava runs), both opening Fitness:
+
+- **Latest run**, first row, first column (1x1): name, date, distance,
+  pace and moving time from `GET https://fitness.teaz.pro/api/runs/latest`.
+- **Weekly km**, first two rows, second and third column (2x2): this week's
+  and last week's kilometers and a bar per week for the last 12 weeks
+  (current week in the accent color) from
+  `GET https://fitness.teaz.pro/api/runs/weekly?weeks=12`.
+
+Both refresh every five minutes and show "Powered by Strava". Users
+without a linked Strava account get "Connect Strava in Fitness.". Set by
+`VITE_FITNESS_URL` in `.env.production`; in `npm run dev` the tiles show
+mock data. No role needed. Fitness lists `https://portal.teaz.pro` in
+`fitness.cors.allowed-origins`. Data in `data/fitnessRuns.ts`, tiles in
+`components/dashboard/FitnessLatestTile.vue` and `FitnessWeeklyTile.vue`.
+The tile positions come from the order in `data/mockApps.ts` (dense grid
+flow); its comment shows the resulting layout.
+
 ## Auth
 
 - Frontend `frontend/src/auth/`: Keycloak (`.env.production`: `auth.teaz.pro`,

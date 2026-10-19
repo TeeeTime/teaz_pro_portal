@@ -1,4 +1,5 @@
 import type { AgendaEvent, AppStat, ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
+import type { FitnessLatestRun, FitnessWeekly } from '@/data/fitnessRuns'
 import type { TransitBoard } from '@/data/transitBoard'
 
 export interface EcosystemApp {
@@ -16,12 +17,14 @@ export interface EcosystemApp {
    * is a preview of the kind of richer content a real app might surface on
    * its dashboard tile — still presentational only, no logic/fetching.
    */
-  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status' | 'progress' | 'transit'
+  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status' | 'progress' | 'transit' | 'fitness-latest' | 'fitness-weekly'
   stat?: AppStat
   events?: AgendaEvent[]
   statuses?: StatusRow[]
   progress?: ProgressRow[]
   transit?: TransitBoard
+  fitnessLatest?: FitnessLatestRun
+  fitnessWeekly?: FitnessWeekly
   /**
    * Keycloak realm role needed to open the app. Purely cosmetic: the app
    * itself enforces the role.
@@ -35,28 +38,65 @@ export interface EcosystemApp {
   withoutRole?: 'show' | 'locked'
 }
 
+/*
+ * The grid fills in this order (dense flow, 5 columns), which gives, at full
+ * width:
+ *
+ *   row 1  Latest run | Weekly km (2x2) . | Study     | Status (1x2)
+ *   row 2  Inventory  | .               . | Transit   | .
+ *   row 3  Analytics (2x2)  . | CRM       | Scheduler (2x1)   .
+ *   row 4  .                . | Docs      | Messaging | Reports (1x2)
+ *   row 5  File Vault | Admin | Settings  | Search    | .
+ *
+ * Changing the order or a span moves the tiles after it; check the layout.
+ */
+
+// Twelve Mondays up to the current week, for the Weekly km mock bars.
+const MOCK_WEEK_KM = [32.4, 35.1, 28.0, 38.6, 41.2, 22.5, 36.8, 40.1, 43.0, 34.7, 37.3, 8.4]
+const mockWeeks = MOCK_WEEK_KM.map((km, i) => ({
+  weekStart: new Date(Date.UTC(2026, 6, 27 + i * 7)).toISOString().slice(0, 10),
+  km,
+}))
+
 /**
  * Placeholder entry points until real ecosystem apps are wired up.
  * `href` targets are not live yet.
  */
 export const mockApps: EcosystemApp[] = [
+  /*
+   * Live from Fitness's /api/runs/latest and /api/runs/weekly in builds (see
+   * fitnessRuns.ts); this mock data only shows in npm run dev.
+   */
   {
-    id: 'analytics',
-    name: 'Analytics',
-    description: 'Usage trends and reporting across the ecosystem.',
-    icon: 'analytics',
-    href: '#',
-    colSpan: 2,
-    rowSpan: 2,
-    variant: 'stat',
-    stat: {
-      value: '12.9K',
-      deltaLabel: '+8.2% vs last week',
-      deltaGood: true,
-      trend: [20, 22, 19, 25, 28, 26, 30, 29, 33, 31, 35, 38],
+    id: 'fitness-latest',
+    name: 'Latest run',
+    description: 'Your latest run from Strava.',
+    icon: 'run',
+    href: 'https://fitness.teaz.pro',
+    variant: 'fitness-latest',
+    fitnessLatest: {
+      run: { name: 'Long Run', date: 'Sun 18 Oct', distance: '17.8', detail: '5:33 /km · 1:38:32' },
+      emptyText: 'Connect Strava in Fitness.',
+      attribution: 'Sample data',
     },
   },
-  { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
+  {
+    id: 'fitness-weekly',
+    name: 'Weekly km',
+    description: 'Kilometers per week from Strava.',
+    icon: 'run',
+    href: 'https://fitness.teaz.pro',
+    colSpan: 2,
+    rowSpan: 2,
+    variant: 'fitness-weekly',
+    fitnessWeekly: {
+      weeks: mockWeeks,
+      thisWeek: '8.4',
+      lastWeek: '37.3',
+      emptyText: 'Connect Strava in Fitness.',
+      attribution: 'Sample data',
+    },
+  },
   /*
    * Live rows from Study's /api/overview in builds (see studyOverview.ts);
    * these mock rows only show in npm run dev.
@@ -77,8 +117,7 @@ export const mockApps: EcosystemApp[] = [
     ],
   },
   /*
-   * Placed right after study so dense flow puts it in the last column,
-   * spanning the first two rows. Live rows come from Teaz Pulse in builds
+   * Last column, first two rows. Live rows come from Teaz Pulse in builds
    * (see pulseHealth.ts); these mock rows only show in npm run dev.
    */
   {
@@ -99,25 +138,10 @@ export const mockApps: EcosystemApp[] = [
       { label: 'Traefik', state: 'good' },
     ],
   },
-  { id: 'crm', name: 'CRM', description: 'Customer relationships and leads.', icon: 'person', href: '#' },
-  {
-    id: 'scheduler',
-    name: 'Scheduler',
-    description: 'Shared calendars and bookings.',
-    icon: 'calendar',
-    href: '#',
-    colSpan: 2,
-    variant: 'agenda',
-    events: [
-      { time: '10:00', title: 'Team sync' },
-      { time: '14:30', title: 'Client call' },
-    ],
-  },
+  { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
   /*
-   * Second row, fourth column: Scheduler (2 wide) doesn't fit there, so dense
-   * flow fills the gap with this 1x1 tile. Live departures come from Teaz
-   * Transit in builds (see transitBoard.ts); these mock rows only show in npm
-   * run dev.
+   * Second row, fourth column. Live departures come from Teaz Transit in
+   * builds (see transitBoard.ts); these mock rows only show in npm run dev.
    */
   {
     id: 'transit',
@@ -138,6 +162,36 @@ export const mockApps: EcosystemApp[] = [
       emptyText: 'Pick your stop in Transit.',
       attribution: 'Sample data',
     },
+  },
+  {
+    id: 'analytics',
+    name: 'Analytics',
+    description: 'Usage trends and reporting across the ecosystem.',
+    icon: 'analytics',
+    href: '#',
+    colSpan: 2,
+    rowSpan: 2,
+    variant: 'stat',
+    stat: {
+      value: '12.9K',
+      deltaLabel: '+8.2% vs last week',
+      deltaGood: true,
+      trend: [20, 22, 19, 25, 28, 26, 30, 29, 33, 31, 35, 38],
+    },
+  },
+  { id: 'crm', name: 'CRM', description: 'Customer relationships and leads.', icon: 'person', href: '#' },
+  {
+    id: 'scheduler',
+    name: 'Scheduler',
+    description: 'Shared calendars and bookings.',
+    icon: 'calendar',
+    href: '#',
+    colSpan: 2,
+    variant: 'agenda',
+    events: [
+      { time: '10:00', title: 'Team sync' },
+      { time: '14:30', title: 'Client call' },
+    ],
   },
   { id: 'docs', name: 'Docs', description: 'Internal documentation.', icon: 'docs', href: '#' },
   { id: 'messaging', name: 'Messaging', description: 'Team chat and notifications.', icon: 'chat', href: '#' },

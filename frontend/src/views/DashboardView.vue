@@ -10,10 +10,13 @@ import {
   StatSparklineTile,
   StatusListTile,
 } from '@teeetime/teaz-pro-ui'
+import FitnessLatestTile from '@/components/dashboard/FitnessLatestTile.vue'
+import FitnessWeeklyTile from '@/components/dashboard/FitnessWeeklyTile.vue'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
 import TransitTile from '@/components/dashboard/TransitTile.vue'
 import { mockApps } from '@/data/mockApps'
 import type { EcosystemApp } from '@/data/mockApps'
+import { useFitnessTiles } from '@/data/fitnessRuns'
 import { usePulseStatuses } from '@/data/pulseHealth'
 import { useStudyCourses } from '@/data/studyOverview'
 import { useTransitBoard } from '@/data/transitBoard'
@@ -25,6 +28,8 @@ const pulseStatuses = usePulseStatuses()
 const studyCourses = useStudyCourses('study-user')
 // Live from Transit in builds; null in dev.
 const transitBoard = useTransitBoard()
+// Live from Fitness in builds; null in dev.
+const fitness = useFitnessTiles()
 
 const auth = useAuth()
 
@@ -85,6 +90,18 @@ function openApp(href: string) {
           :icon="app.icon"
           :name="app.name"
           :board="transitBoard ?? app.transit"
+        />
+        <FitnessLatestTile
+          v-else-if="app.variant === 'fitness-latest' && app.fitnessLatest"
+          :icon="app.icon"
+          :name="app.name"
+          :latest="fitness.latest.value ?? app.fitnessLatest"
+        />
+        <FitnessWeeklyTile
+          v-else-if="app.variant === 'fitness-weekly' && app.fitnessWeekly"
+          :icon="app.icon"
+          :name="app.name"
+          :weekly="fitness.weekly.value ?? app.fitnessWeekly"
         />
         <AppTile
           v-else
