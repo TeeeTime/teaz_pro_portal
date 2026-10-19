@@ -1,26 +1,11 @@
-export interface AppStat {
-  value: string
-  deltaLabel: string
-  deltaGood: boolean
-  /** 12-point trend, oldest first. */
-  trend: number[]
-}
-
-export interface AgendaEvent {
-  time: string
-  title: string
-}
-
-export interface StatusRow {
-  label: string
-  state: 'good' | 'warning' | 'critical'
-}
+import type { AgendaEvent, AppStat, ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
+import type { TransitBoard } from '@/data/transitBoard'
 
 export interface EcosystemApp {
   id: string
   name: string
   description: string
-  /** Name of an icon defined in components/icons/Icon.vue — never an emoji. */
+  /** Name of an icon from teaz_pro_ui's Icon component — never an emoji. */
   icon: string
   href: string
   colSpan?: number
@@ -31,10 +16,23 @@ export interface EcosystemApp {
    * is a preview of the kind of richer content a real app might surface on
    * its dashboard tile — still presentational only, no logic/fetching.
    */
-  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status'
+  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status' | 'progress' | 'transit'
   stat?: AppStat
   events?: AgendaEvent[]
   statuses?: StatusRow[]
+  progress?: ProgressRow[]
+  transit?: TransitBoard
+  /**
+   * Keycloak realm role needed to open the app. Purely cosmetic: the app
+   * itself enforces the role.
+   */
+  requiredRole?: string
+  /**
+   * Without requiredRole: 'show' (default) keeps the tile's content, just not
+   * clickable (Status: health is public). 'locked' replaces it with a
+   * NoAccessTile (Study: the content is the user's own data in that app).
+   */
+  withoutRole?: 'show' | 'locked'
 }
 
 /**
@@ -59,7 +57,48 @@ export const mockApps: EcosystemApp[] = [
     },
   },
   { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
-  { id: 'billing', name: 'Billing', description: 'Invoices and payment history.', icon: 'card', href: '#' },
+  /*
+   * Live rows from Study's /api/overview in builds (see studyOverview.ts);
+   * these mock rows only show in npm run dev.
+   */
+  {
+    id: 'study',
+    name: 'Study',
+    description: 'Your courses and learning progress.',
+    icon: 'study',
+    href: 'https://study.teaz.pro',
+    variant: 'progress',
+    requiredRole: 'study-user',
+    withoutRole: 'locked',
+    progress: [
+      { label: 'Operations Research', percent: 64 },
+      { label: 'Lineare Algebra', percent: 12 },
+      { label: 'Statistik II', percent: 0 },
+    ],
+  },
+  /*
+   * Placed right after study so dense flow puts it in the last column,
+   * spanning the first two rows. Live rows come from Teaz Pulse in builds
+   * (see pulseHealth.ts); these mock rows only show in npm run dev.
+   */
+  {
+    id: 'status',
+    name: 'Status',
+    description: 'Service health and uptime.',
+    icon: 'pulse',
+    href: 'https://pulse.teaz.pro',
+    // Pulse's container view needs it; the health rows here don't.
+    requiredRole: 'pulse-admin',
+    rowSpan: 2,
+    variant: 'status',
+    statuses: [
+      { label: 'Demo', state: 'critical', detail: '(0/1)' },
+      { label: 'Portal', state: 'warning', detail: '(2/2)' },
+      { label: 'Keycloak', state: 'good', detail: '(2/2)' },
+      { label: 'Pulse', state: 'good', detail: '(3/3)' },
+      { label: 'Traefik', state: 'good' },
+    ],
+  },
   { id: 'crm', name: 'CRM', description: 'Customer relationships and leads.', icon: 'person', href: '#' },
   {
     id: 'scheduler',
@@ -74,7 +113,32 @@ export const mockApps: EcosystemApp[] = [
       { time: '14:30', title: 'Client call' },
     ],
   },
-  { id: 'support', name: 'Support Desk', description: 'Customer support tickets.', icon: 'headset', href: '#' },
+  /*
+   * Second row, fourth column: Scheduler (2 wide) doesn't fit there, so dense
+   * flow fills the gap with this 1x1 tile. Live departures come from Teaz
+   * Transit in builds (see transitBoard.ts); these mock rows only show in npm
+   * run dev.
+   */
+  {
+    id: 'transit',
+    name: 'Transit',
+    description: 'Next departures at your stop.',
+    icon: 'calendar',
+    href: 'https://transit.teaz.pro',
+    variant: 'transit',
+    transit: {
+      station: 'Münster Hauptbahnhof',
+      departures: [
+        { key: '1', time: '08:04', line: 'RE 7', destination: 'Krefeld Hbf', delay: 3 },
+        { key: '2', time: '08:06', line: '11', destination: 'Tannenhof' },
+        { key: '3', time: '08:09', line: 'RB 66', destination: 'Osnabrück Hbf', canceled: true },
+        { key: '4', time: '08:12', line: 'S75', destination: 'Bocholt, Bustreff' },
+        { key: '5', time: '08:15', line: 'ICE 41', destination: 'Dortmund Hbf' },
+      ],
+      emptyText: 'Pick your stop in Transit.',
+      attribution: 'Sample data',
+    },
+  },
   { id: 'docs', name: 'Docs', description: 'Internal documentation.', icon: 'docs', href: '#' },
   { id: 'messaging', name: 'Messaging', description: 'Team chat and notifications.', icon: 'chat', href: '#' },
   {
@@ -90,31 +154,11 @@ export const mockApps: EcosystemApp[] = [
   { id: 'admin', name: 'Admin', description: 'User and role management.', icon: 'shield', href: '#' },
   { id: 'settings', name: 'Settings', description: 'Ecosystem-wide configuration.', icon: 'gear', href: '#' },
   {
-    id: 'status',
-    name: 'Status',
-    description: 'Service health and uptime.',
-    icon: 'pulse',
-    href: '#',
-    variant: 'status',
-    statuses: [
-      { label: 'API', state: 'good' },
-      { label: 'Database', state: 'good' },
-      { label: 'Queue', state: 'warning' },
-    ],
-  },
-  {
     id: 'search',
     name: 'Search',
     description: 'Find anything across the ecosystem.',
     icon: 'search',
     href: '#',
     variant: 'search',
-  },
-  {
-    id: 'notifications',
-    name: 'Notifications',
-    description: 'Cross-app alerts and activity.',
-    icon: 'bell',
-    href: '#',
   },
 ]

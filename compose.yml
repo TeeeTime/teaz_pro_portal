@@ -1,0 +1,33 @@
+# Production deploy on the VPS: `docker compose up -d --build`.
+# Expects the shared Traefik instance on the external "proxy" network
+# with a certificate resolver named "le".
+services:
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portal.rule=Host(`portal.teaz.pro`)
+      - traefik.http.routers.portal.tls.certresolver=le
+      - traefik.http.services.portal.loadbalancer.server.port=80
+      # Shown and controllable in Teaz Pulse.
+      - pro.teaz.pulse.app=Portal
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      # Same host, /api only; Traefik prefers this longer rule over the frontend's.
+      - traefik.http.routers.portal-api.rule=Host(`portal.teaz.pro`) && PathPrefix(`/api`)
+      - traefik.http.routers.portal-api.tls.certresolver=le
+      - traefik.http.services.portal-api.loadbalancer.server.port=8080
+      - pro.teaz.pulse.app=Portal
+
+networks:
+  proxy:
+    external: true

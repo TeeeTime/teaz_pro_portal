@@ -1,13 +1,40 @@
 <script setup lang="ts">
-import GridLayout from '@/components/grid/GridLayout.vue'
-import GridItem from '@/components/grid/GridItem.vue'
-import AppTile from '@/components/dashboard/AppTile.vue'
-import StatSparklineTile from '@/components/dashboard/StatSparklineTile.vue'
-import AgendaTile from '@/components/dashboard/AgendaTile.vue'
+import {
+  AgendaTile,
+  AppTile,
+  GridItem,
+  GridLayout,
+  NoAccessTile,
+  ProgressListTile,
+  SearchFieldTile,
+  StatSparklineTile,
+  StatusListTile,
+} from '@teeetime/teaz-pro-ui'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
-import SearchFieldTile from '@/components/dashboard/SearchFieldTile.vue'
-import StatusListTile from '@/components/dashboard/StatusListTile.vue'
+import TransitTile from '@/components/dashboard/TransitTile.vue'
 import { mockApps } from '@/data/mockApps'
+import type { EcosystemApp } from '@/data/mockApps'
+import { usePulseStatuses } from '@/data/pulseHealth'
+import { useStudyCourses } from '@/data/studyOverview'
+import { useTransitBoard } from '@/data/transitBoard'
+import { useAuth } from '@/auth'
+
+// Live from Teaz Pulse in builds; null in dev, where the mock rows stay.
+const pulseStatuses = usePulseStatuses()
+// Live from Study in builds (if the user has its role); null in dev.
+const studyCourses = useStudyCourses('study-user')
+// Live from Transit in builds; null in dev.
+const transitBoard = useTransitBoard()
+
+const auth = useAuth()
+
+function canOpen(app: EcosystemApp): boolean {
+  return !app.requiredRole || (auth.user.value?.roles.includes(app.requiredRole) ?? false)
+}
+
+function locked(app: EcosystemApp): boolean {
+  return app.withoutRole === 'locked' && !canOpen(app)
+}
 
 function openApp(href: string) {
   if (href === '#') return
@@ -27,7 +54,8 @@ function openApp(href: string) {
       with real embedded controls (form, search) stop click/keydown
       propagation around just those controls so interacting with them
       doesn't also trigger the card's own "navigate" activation; see each
-      component for that handling.
+      component for that handling. The one exception: an app with a
+      requiredRole the user lacks stays visible but isn't clickable.
     -->
     <GridLayout :columns="5" :gap="16">
       <GridItem
@@ -35,15 +63,29 @@ function openApp(href: string) {
         :key="app.id"
         :col-span="app.colSpan"
         :row-span="app.rowSpan"
-        clickable
+        :clickable="canOpen(app)"
         :aria-label="app.name"
-        @click="openApp(app.href)"
+        @click="canOpen(app) && openApp(app.href)"
       >
-        <StatSparklineTile v-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
+        <NoAccessTile v-if="locked(app)" :icon="app.icon" :name="app.name" />
+        <StatSparklineTile v-else-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
         <AgendaTile v-else-if="app.variant === 'agenda' && app.events" :icon="app.icon" :name="app.name" :events="app.events" />
         <QuickFormTile v-else-if="app.variant === 'form'" :icon="app.icon" :name="app.name" />
-        <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" />
-        <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="app.statuses" />
+        <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" placeholder="Search ecosystem…" />
+        <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="pulseStatuses ?? app.statuses" />
+        <ProgressListTile
+          v-else-if="app.variant === 'progress' && app.progress"
+          :icon="app.icon"
+          :name="app.name"
+          :items="studyCourses?.rows ?? app.progress"
+          :empty-text="studyCourses?.emptyText"
+        />
+        <TransitTile
+          v-else-if="app.variant === 'transit' && app.transit"
+          :icon="app.icon"
+          :name="app.name"
+          :board="transitBoard ?? app.transit"
+        />
         <AppTile
           v-else
           :icon="app.icon"
