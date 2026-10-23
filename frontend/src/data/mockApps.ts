@@ -1,6 +1,7 @@
-import type { AppStat, ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
+import type { ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
 import type { CalendarToday } from '@/data/calendarToday'
 import type { FitnessLatestRun, FitnessWeekly } from '@/data/fitnessRuns'
+import type { PerformanceLoad } from '@/data/pulseLoad'
 import type { TransitBoard } from '@/data/transitBoard'
 
 export interface EcosystemApp {
@@ -18,8 +19,8 @@ export interface EcosystemApp {
    * is a preview of the kind of richer content a real app might surface on
    * its dashboard tile — still presentational only, no logic/fetching.
    */
-  variant?: 'time' | 'stat' | 'calendar' | 'form' | 'search' | 'status' | 'progress' | 'transit' | 'fitness-latest' | 'fitness-weekly'
-  stat?: AppStat
+  variant?: 'time' | 'calendar' | 'performance' | 'status' | 'progress' | 'transit' | 'fitness-latest' | 'fitness-weekly'
+  performance?: PerformanceLoad
   calendar?: CalendarToday
   statuses?: StatusRow[]
   progress?: ProgressRow[]
@@ -45,10 +46,7 @@ export interface EcosystemApp {
  *
  *   row 1  Time       | Weekly km (2x2) . | Study     | Status (1x2)
  *   row 2  Latest run | .               . | Transit   | .
- *   row 3  Analytics (2x2)  . | CRM       | Calendar (2x1)    .
- *   row 4  .                . | Inventory | Docs      | Messaging
- *   row 5  Reports (1x2) | File Vault | Admin | Settings | Search
- *   row 6  .
+ *   row 3  Calendar (2x1)              .  | Performance (3x1)  .  .
  *
  * Changing the order or a span moves the tiles after it; check the layout.
  */
@@ -60,9 +58,22 @@ const mockWeeks = MOCK_WEEK_KM.map((km, i) => ({
   km,
 }))
 
+// An hour of Pulse measurements every 10 s up to now, drifting, for the Performance mock chart.
+const MOCK_NOW = Date.now()
+const mockLoad = Array.from({ length: 360 }, (_, i) => {
+  const t = i / 10
+  return {
+    at: MOCK_NOW - (359 - i) * 10_000,
+    cpu: 34 + 8 * Math.sin(t / 5) + 4 * Math.sin(t * 1.7),
+    cpuTeaz: 13 + 4 * Math.sin(t / 4) + 2 * Math.sin(t * 2.3),
+    memory: 45 + 3 * Math.sin(t / 9),
+    memoryTeaz: 16 + 1.5 * Math.sin(t / 7),
+  }
+})
+
 /**
- * Placeholder entry points until real ecosystem apps are wired up.
- * `href` targets are not live yet.
+ * The dashboard's tiles in grid order. The data here is what they show in
+ * `npm run dev`; builds fetch it live from each app (see the data/ modules).
  */
 export const mockApps: EcosystemApp[] = [
   /* The device's own clock, nothing fetched (TimeTile.vue). */
@@ -167,25 +178,8 @@ export const mockApps: EcosystemApp[] = [
       attribution: 'Sample data',
     },
   },
-  {
-    id: 'analytics',
-    name: 'Analytics',
-    description: 'Usage trends and reporting across the ecosystem.',
-    icon: 'analytics',
-    href: '#',
-    colSpan: 2,
-    rowSpan: 2,
-    variant: 'stat',
-    stat: {
-      value: '12.9K',
-      deltaLabel: '+8.2% vs last week',
-      deltaGood: true,
-      trend: [20, 22, 19, 25, 28, 26, 30, 29, 33, 31, 35, 38],
-    },
-  },
-  { id: 'crm', name: 'CRM', description: 'Customer relationships and leads.', icon: 'person', href: '#' },
   /*
-   * Third row, fourth and fifth column (2x1). Live from Calendar's
+   * Third row, first and second column (2x1). Live from Calendar's
    * /api/events/today in builds (see calendarToday.ts); this mock data only
    * shows in npm run dev.
    */
@@ -208,27 +202,26 @@ export const mockApps: EcosystemApp[] = [
       emptyText: 'Connect your Apple calendar in Calendar.',
     },
   },
-  { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
-  { id: 'docs', name: 'Docs', description: 'Internal documentation.', icon: 'docs', href: '#' },
-  { id: 'messaging', name: 'Messaging', description: 'Team chat and notifications.', icon: 'chat', href: '#' },
+  /*
+   * Third row, third to fifth column (3x1). Live from Pulse's /api/load in
+   * builds (see pulseLoad.ts); this mock data only shows in npm run dev.
+   */
   {
-    id: 'reports',
-    name: 'Reports',
-    description: 'Exportable business reports.',
-    icon: 'report',
-    href: '#',
-    rowSpan: 2,
-    variant: 'form',
-  },
-  { id: 'files', name: 'File Vault', description: 'Shared document storage.', icon: 'archive', href: '#' },
-  { id: 'admin', name: 'Admin', description: 'User and role management.', icon: 'shield', href: '#' },
-  { id: 'settings', name: 'Settings', description: 'Ecosystem-wide configuration.', icon: 'gear', href: '#' },
-  {
-    id: 'search',
-    name: 'Search',
-    description: 'Find anything across the ecosystem.',
-    icon: 'search',
-    href: '#',
-    variant: 'search',
+    id: 'performance',
+    name: 'Performance',
+    description: 'CPU and memory of the server.',
+    icon: 'analytics',
+    href: 'https://pulse.teaz.pro/?view=performance',
+    // Pulse needs it; the chart here doesn't.
+    requiredRole: 'pulse-admin',
+    colSpan: 3,
+    variant: 'performance',
+    performance: {
+      points: mockLoad,
+      intervalMs: 10_000,
+      windowMs: 3_600_000,
+      server: '4 cores · 8 GB',
+      emptyText: '',
+    },
   },
 ]

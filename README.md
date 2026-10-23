@@ -24,8 +24,8 @@ no Keycloak is needed.
 `TopBar`, `GridLayout`/`GridItem`, `Icon`, the dashboard tiles, `useTheme()`
 and the theme tokens come from **`teaz_pro_ui`**
 (`@teeetime/teaz-pro-ui`, installed from GitHub, pinned to a tag in
-`frontend/package.json`). Only portal-specific pieces stay here
-(`QuickFormTile`, the mock data, the dashboard view). To pick up a new
+`frontend/package.json`). Only portal-specific pieces stay here (the
+tiles that know another app's data, the mock data, the dashboard view). To pick up a new
 release: `npm install github:TeeeTime/teaz_pro_ui#v<version>` in
 `frontend/` (editing the tag and running a plain `npm install` keeps the
 old version from the lock file).
@@ -40,7 +40,7 @@ in `npm run dev` it's unset and the tile shows mock rows. Pulse must list
 
 ## Study tile
 
-Top row, next to Inventory: the learner's Study courses with progress in
+First row, fourth column (1x1): the learner's Study courses with progress in
 percent, from `GET https://study.teaz.pro/api/overview` (refreshed every 5
 minutes). Set by `VITE_STUDY_URL` in `.env.production`; in `npm run dev` the
 tile shows mock rows. Users without the realm role `study-user` get a
@@ -89,7 +89,7 @@ flow); its comment shows the resulting layout.
 
 ## Calendar tile
 
-Third row, fourth and fifth column (2x1): the user's events today from
+Third row, first and second column (2x1): the user's events today from
 `GET https://calendar.teaz.pro/api/events/today` (refreshed every five
 minutes and right after midnight), drawn like Teaz Calendar's own views:
 each event in its iCloud calendar's color, all-day events first, past
@@ -101,6 +101,22 @@ in `.env.production`; in `npm run dev` the tile shows mock events. No role
 needed. Calendar lists `https://portal.teaz.pro` in
 `calendar.cors.allowed-origins`. Data in `data/calendarToday.ts`, tile in
 `components/dashboard/CalendarTile.vue`.
+
+## Performance tile
+
+Third row, third to fifth column (3x1): the server's CPU and memory over
+the last hour from Teaz Pulse (`GET https://pulse.teaz.pro/api/load`,
+refreshed every 30 seconds), all four lines on one chart. Both are a share
+of the server on one 0–100% axis (CPU of all cores, memory of its RAM).
+Color is the measure (CPU accent blue, memory orange), line style whose
+it is (solid the whole server, dashed the Teaz containers). The legend
+shows the latest values, or those under the cursor while hovering; the
+header the server's size. Any logged-in user sees the chart (Pulse allows
+it); only users with `pulse-admin` can click through to Pulse's
+Performance view. Set by `VITE_PULSE_URL` in `.env.production`; in
+`npm run dev` the tile shows a made-up hour. Data in `data/pulseLoad.ts`,
+tile in `components/dashboard/PerformanceTile.vue`. Memory's orange is set
+in the tile per theme, as `themes.css` has no chart colors yet.
 
 ## Auth
 

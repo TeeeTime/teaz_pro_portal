@@ -1,18 +1,9 @@
 <script setup lang="ts">
-import {
-  AppTile,
-  GridItem,
-  GridLayout,
-  NoAccessTile,
-  ProgressListTile,
-  SearchFieldTile,
-  StatSparklineTile,
-  StatusListTile,
-} from '@teeetime/teaz-pro-ui'
+import { AppTile, GridItem, GridLayout, NoAccessTile, ProgressListTile, StatusListTile } from '@teeetime/teaz-pro-ui'
 import CalendarTile from '@/components/dashboard/CalendarTile.vue'
 import FitnessLatestTile from '@/components/dashboard/FitnessLatestTile.vue'
 import FitnessWeeklyTile from '@/components/dashboard/FitnessWeeklyTile.vue'
-import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
+import PerformanceTile from '@/components/dashboard/PerformanceTile.vue'
 import TimeTile from '@/components/dashboard/TimeTile.vue'
 import TransitTile from '@/components/dashboard/TransitTile.vue'
 import { mockApps } from '@/data/mockApps'
@@ -20,12 +11,15 @@ import type { EcosystemApp } from '@/data/mockApps'
 import { useCalendarToday } from '@/data/calendarToday'
 import { useFitnessTiles } from '@/data/fitnessRuns'
 import { usePulseStatuses } from '@/data/pulseHealth'
+import { usePulseLoad } from '@/data/pulseLoad'
 import { useStudyCourses } from '@/data/studyOverview'
 import { useTransitBoard } from '@/data/transitBoard'
 import { useAuth } from '@/auth'
 
 // Live from Teaz Pulse in builds; null in dev, where the mock rows stay.
 const pulseStatuses = usePulseStatuses()
+// Live from Teaz Pulse in builds; null in dev, where the mock chart stays.
+const pulseLoad = usePulseLoad()
 // Live from Study in builds (if the user has its role); null in dev.
 const studyCourses = useStudyCourses('study-user')
 // Live from Transit in builds; null in dev.
@@ -58,13 +52,10 @@ function openApp(href: string) {
     </header>
 
     <!--
-      Every tile still lives in a clickable GridItem regardless of variant —
-      clicking the card (header, padding, background) opens the app. Tiles
-      with real embedded controls (form, search) stop click/keydown
-      propagation around just those controls so interacting with them
-      doesn't also trigger the card's own "navigate" activation; see each
-      component for that handling. The one exception: an app with a
-      requiredRole the user lacks stays visible but isn't clickable.
+      Every tile lives in a clickable GridItem regardless of variant —
+      clicking anywhere on the card opens the app. The one exception: an
+      app with a requiredRole the user lacks stays visible but isn't
+      clickable.
     -->
     <GridLayout :columns="5" :gap="16">
       <GridItem
@@ -78,15 +69,18 @@ function openApp(href: string) {
       >
         <NoAccessTile v-if="locked(app)" :icon="app.icon" :name="app.name" />
         <TimeTile v-else-if="app.variant === 'time'" :icon="app.icon" :name="app.name" />
-        <StatSparklineTile v-else-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
         <CalendarTile
           v-else-if="app.variant === 'calendar' && app.calendar"
           :icon="app.icon"
           :name="app.name"
           :today="calendarToday ?? app.calendar"
         />
-        <QuickFormTile v-else-if="app.variant === 'form'" :icon="app.icon" :name="app.name" />
-        <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" placeholder="Search ecosystem…" />
+        <PerformanceTile
+          v-else-if="app.variant === 'performance' && app.performance"
+          :icon="app.icon"
+          :name="app.name"
+          :load="pulseLoad ?? app.performance"
+        />
         <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="pulseStatuses ?? app.statuses" />
         <ProgressListTile
           v-else-if="app.variant === 'progress' && app.progress"
