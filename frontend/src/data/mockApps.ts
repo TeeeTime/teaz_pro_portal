@@ -18,7 +18,7 @@ export interface EcosystemApp {
    * is a preview of the kind of richer content a real app might surface on
    * its dashboard tile — still presentational only, no logic/fetching.
    */
-  variant?: 'stat' | 'calendar' | 'form' | 'search' | 'status' | 'progress' | 'transit' | 'fitness-latest' | 'fitness-weekly'
+  variant?: 'time' | 'stat' | 'calendar' | 'form' | 'search' | 'status' | 'progress' | 'transit' | 'fitness-latest' | 'fitness-weekly'
   stat?: AppStat
   calendar?: CalendarToday
   statuses?: StatusRow[]
@@ -43,11 +43,12 @@ export interface EcosystemApp {
  * The grid fills in this order (dense flow, 5 columns), which gives, at full
  * width:
  *
- *   row 1  Latest run | Weekly km (2x2) . | Study     | Status (1x2)
- *   row 2  Inventory  | .               . | Transit   | .
+ *   row 1  Time       | Weekly km (2x2) . | Study     | Status (1x2)
+ *   row 2  Latest run | .               . | Transit   | .
  *   row 3  Analytics (2x2)  . | CRM       | Calendar (2x1)    .
- *   row 4  .                . | Docs      | Messaging | Reports (1x2)
- *   row 5  File Vault | Admin | Settings  | Search    | .
+ *   row 4  .                . | Inventory | Docs      | Messaging
+ *   row 5  Reports (1x2) | File Vault | Admin | Settings | Search
+ *   row 6  .
  *
  * Changing the order or a span moves the tiles after it; check the layout.
  */
@@ -64,23 +65,12 @@ const mockWeeks = MOCK_WEEK_KM.map((km, i) => ({
  * `href` targets are not live yet.
  */
 export const mockApps: EcosystemApp[] = [
+  /* The device's own clock, nothing fetched (TimeTile.vue). */
+  { id: 'time', name: 'Time', description: 'The current time.', icon: 'clock', href: '#', variant: 'time' },
   /*
    * Live from Fitness's /api/runs/latest and /api/runs/weekly in builds (see
    * fitnessRuns.ts); this mock data only shows in npm run dev.
    */
-  {
-    id: 'fitness-latest',
-    name: 'Latest run',
-    description: 'Your latest run from Strava.',
-    icon: 'run',
-    href: 'https://fitness.teaz.pro',
-    variant: 'fitness-latest',
-    fitnessLatest: {
-      run: { name: 'Long Run', date: 'Sun 18 Oct', distance: '17.8', detail: '5:33 /km · 1:38:32' },
-      emptyText: 'Connect Strava in Fitness.',
-      attribution: 'Sample data',
-    },
-  },
   {
     id: 'fitness-weekly',
     name: 'Weekly km',
@@ -139,7 +129,20 @@ export const mockApps: EcosystemApp[] = [
       { label: 'Traefik', state: 'good' },
     ],
   },
-  { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
+  // Second row, first column, below Time.
+  {
+    id: 'fitness-latest',
+    name: 'Latest run',
+    description: 'Your latest run from Strava.',
+    icon: 'run',
+    href: 'https://fitness.teaz.pro',
+    variant: 'fitness-latest',
+    fitnessLatest: {
+      run: { name: 'Long Run', date: 'Sun 18 Oct', distance: '17.8', detail: '5:33 /km · 1:38:32' },
+      emptyText: 'Connect Strava in Fitness.',
+      attribution: 'Sample data',
+    },
+  },
   /*
    * Second row, fourth column. Live departures come from Teaz Transit in
    * builds (see transitBoard.ts); these mock rows only show in npm run dev.
@@ -205,6 +208,7 @@ export const mockApps: EcosystemApp[] = [
       emptyText: 'Connect your Apple calendar in Calendar.',
     },
   },
+  { id: 'inventory', name: 'Inventory', description: 'Stock and warehouse tracking.', icon: 'box', href: '#' },
   { id: 'docs', name: 'Docs', description: 'Internal documentation.', icon: 'docs', href: '#' },
   { id: 'messaging', name: 'Messaging', description: 'Team chat and notifications.', icon: 'chat', href: '#' },
   {

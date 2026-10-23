@@ -61,11 +61,17 @@ needed. Transit must list `https://portal.teaz.pro` in
 (`components/dashboard/TransitTile.vue`) stays in portal, as it knows
 Transit's data.
 
+## Time tile
+
+First row, first column (1x1): the current time with seconds and today's
+date, from the device's own clock and time zone. Nothing is fetched; it ticks
+on each full second (`components/dashboard/TimeTile.vue`).
+
 ## Fitness tiles
 
 Two tiles from Teaz Fitness (the user's Strava runs), both opening Fitness:
 
-- **Latest run**, first row, first column (1x1): name, date, distance,
+- **Latest run**, second row, first column (1x1): name, date, distance,
   pace and moving time from `GET https://fitness.teaz.pro/api/runs/latest`.
 - **Weekly km**, first two rows, second and third column (2x2): this week's
   and last week's kilometers and a bar per week for the last 12 weeks

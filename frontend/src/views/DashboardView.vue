@@ -13,6 +13,7 @@ import CalendarTile from '@/components/dashboard/CalendarTile.vue'
 import FitnessLatestTile from '@/components/dashboard/FitnessLatestTile.vue'
 import FitnessWeeklyTile from '@/components/dashboard/FitnessWeeklyTile.vue'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
+import TimeTile from '@/components/dashboard/TimeTile.vue'
 import TransitTile from '@/components/dashboard/TransitTile.vue'
 import { mockApps } from '@/data/mockApps'
 import type { EcosystemApp } from '@/data/mockApps'
@@ -76,6 +77,7 @@ function openApp(href: string) {
         @click="canOpen(app) && openApp(app.href)"
       >
         <NoAccessTile v-if="locked(app)" :icon="app.icon" :name="app.name" />
+        <TimeTile v-else-if="app.variant === 'time'" :icon="app.icon" :name="app.name" />
         <StatSparklineTile v-else-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
         <CalendarTile
           v-else-if="app.variant === 'calendar' && app.calendar"
