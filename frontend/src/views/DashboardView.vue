@@ -31,17 +31,20 @@ const calendarToday = useCalendarToday()
 
 const auth = useAuth()
 
-function canOpen(app: EcosystemApp): boolean {
+function hasRole(app: EcosystemApp): boolean {
   return !app.requiredRole || (auth.user.value?.roles.includes(app.requiredRole) ?? false)
 }
 
-function locked(app: EcosystemApp): boolean {
-  return app.withoutRole === 'locked' && !canOpen(app)
+function canOpen(app: EcosystemApp): boolean {
+  return app.href !== undefined && hasRole(app)
 }
 
-function openApp(href: string) {
-  if (href === '#') return
-  window.location.href = href
+function locked(app: EcosystemApp): boolean {
+  return app.withoutRole === 'locked' && !hasRole(app)
+}
+
+function openApp(app: EcosystemApp) {
+  if (canOpen(app)) window.location.href = app.href!
 }
 </script>
 
@@ -53,9 +56,9 @@ function openApp(href: string) {
 
     <!--
       Every tile lives in a clickable GridItem regardless of variant —
-      clicking anywhere on the card opens the app. The one exception: an
-      app with a requiredRole the user lacks stays visible but isn't
-      clickable.
+      clicking anywhere on the card opens the app. The exceptions stay
+      visible but aren't clickable: a tile without an app behind it (Time)
+      and an app with a requiredRole the user lacks.
     -->
     <GridLayout :columns="5" :gap="16">
       <GridItem
@@ -65,7 +68,7 @@ function openApp(href: string) {
         :row-span="app.rowSpan"
         :clickable="canOpen(app)"
         :aria-label="app.name"
-        @click="canOpen(app) && openApp(app.href)"
+        @click="openApp(app)"
       >
         <NoAccessTile v-if="locked(app)" :icon="app.icon" :name="app.name" />
         <TimeTile v-else-if="app.variant === 'time'" :icon="app.icon" :name="app.name" />

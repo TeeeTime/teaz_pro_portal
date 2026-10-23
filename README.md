@@ -65,7 +65,8 @@ Transit's data.
 
 First row, first column (1x1): the current time with seconds and today's
 date, from the device's own clock and time zone. Nothing is fetched; it ticks
-on each full second (`components/dashboard/TimeTile.vue`).
+on each full second (`components/dashboard/TimeTile.vue`). No app behind it,
+so it isn't clickable.
 
 ## Fitness tiles
 

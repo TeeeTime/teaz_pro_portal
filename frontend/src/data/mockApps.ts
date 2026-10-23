@@ -10,7 +10,8 @@ export interface EcosystemApp {
   description: string
   /** Name of an icon from teaz_pro_ui's Icon component — never an emoji. */
   icon: string
-  href: string
+  /** The app the tile opens. Unset: no app behind it (Time), so never clickable. */
+  href?: string
   colSpan?: number
   rowSpan?: number
   /**
@@ -77,7 +78,7 @@ const mockLoad = Array.from({ length: 360 }, (_, i) => {
  */
 export const mockApps: EcosystemApp[] = [
   /* The device's own clock, nothing fetched (TimeTile.vue). */
-  { id: 'time', name: 'Time', description: 'The current time.', icon: 'clock', href: '#', variant: 'time' },
+  { id: 'time', name: 'Time', description: 'The current time.', icon: 'clock', variant: 'time' },
   /*
    * Live from Fitness's /api/runs/latest and /api/runs/weekly in builds (see
    * fitnessRuns.ts); this mock data only shows in npm run dev.
