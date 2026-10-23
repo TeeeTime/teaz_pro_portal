@@ -86,8 +86,8 @@ flow); its comment shows the resulting layout.
 Third row, fourth and fifth column (2x1): the user's events today from
 `GET https://calendar.teaz.pro/api/events/today` (refreshed every five
 minutes and right after midnight), drawn like Teaz Calendar's own views:
-each event in its iCloud calendar's color, all-day events first, the "now"
-line between what's over and what's next, past events faded. As many as fit;
+each event in its iCloud calendar's color, all-day events first, past
+events faded. As many as fit;
 when that's not all, the ones that are over go first and "+n more" counts the
 rest. Users without a connected Apple calendar get "Connect your Apple
 calendar in Calendar."; the tile opens Calendar. Set by `VITE_CALENDAR_URL`

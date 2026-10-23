@@ -14,8 +14,7 @@ const props = defineProps<CalendarTileProps>()
 /*
  * Today's events (from Teaz Calendar), drawn like Calendar's own views: each
  * event in its calendar's color (a strip and a tinted fill), all-day events
- * first, a "now" line in the accent color between what's over and what's
- * next, past events faded. Portal-only: it knows Calendar's data. Shows as
+ * first, past events faded. Portal-only: it knows Calendar's data. Shows as
  * many rows as fit; when that's not all, the ones that are over go first.
  */
 const ROW_HEIGHT = 30
@@ -62,14 +61,6 @@ const shown = computed(() => {
   return { visible, more: props.today.events.length - visible.length }
 })
 
-/** Index of the row the now line goes above: the first timed event that isn't over, once one is. */
-const nowLineBefore = computed(() => {
-  const rows = shown.value.visible
-  if (!rows.some(past)) return -1
-  const next = rows.findIndex((e) => !e.allDay && !past(e))
-  return next === -1 ? rows.length : next
-})
-
 function colorStyle(event: CalendarTodayEvent): Record<string, string> {
   return event.color ? { '--event-color': event.color } : {}
 }
@@ -86,18 +77,16 @@ function colorStyle(event: CalendarTodayEvent): Record<string, string> {
     <div ref="bodyEl" class="calendar-tile__body">
       <p v-if="!today.events.length" class="calendar-tile__empty">{{ today.emptyText }}</p>
       <ol v-else class="calendar-tile__list">
-        <template v-for="(event, index) in shown.visible" :key="event.key">
-          <li v-if="index === nowLineBefore" class="calendar-tile__now" aria-hidden="true" />
-          <li
-            class="calendar-tile__event"
-            :class="{ 'calendar-tile__event--past': past(event), 'calendar-tile__event--all-day': event.allDay }"
-            :style="colorStyle(event)"
-          >
-            <span v-if="!event.allDay" class="calendar-tile__time">{{ event.time }}</span>
-            <span class="calendar-tile__title" :title="event.title">{{ event.title }}</span>
-          </li>
-        </template>
-        <li v-if="nowLineBefore === shown.visible.length" class="calendar-tile__now" aria-hidden="true" />
+        <li
+          v-for="event in shown.visible"
+          :key="event.key"
+          class="calendar-tile__event"
+          :class="{ 'calendar-tile__event--past': past(event), 'calendar-tile__event--all-day': event.allDay }"
+          :style="colorStyle(event)"
+        >
+          <span v-if="!event.allDay" class="calendar-tile__time">{{ event.time }}</span>
+          <span class="calendar-tile__title" :title="event.title">{{ event.title }}</span>
+        </li>
       </ol>
     </div>
 
@@ -207,24 +196,6 @@ function colorStyle(event: CalendarTodayEvent): Record<string, string> {
 
 .calendar-tile__event--all-day .calendar-tile__title {
   font-weight: 500;
-}
-
-/* Calendar's "now" line: a square and a line in the accent color. */
-.calendar-tile__now {
-  position: relative;
-  height: 2px;
-  margin: 1px 0 1px 4px;
-  background-color: var(--color-accent);
-}
-
-.calendar-tile__now::before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: -4px;
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-accent);
 }
 
 .calendar-tile__more {
