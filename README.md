@@ -81,6 +81,21 @@ mock data. No role needed. Fitness lists `https://portal.teaz.pro` in
 The tile positions come from the order in `data/mockApps.ts` (dense grid
 flow); its comment shows the resulting layout.
 
+## Calendar tile
+
+Third row, fourth and fifth column (2x1): the user's events today from
+`GET https://calendar.teaz.pro/api/events/today` (refreshed every five
+minutes and right after midnight), drawn like Teaz Calendar's own views:
+each event in its iCloud calendar's color, all-day events first, the "now"
+line between what's over and what's next, past events faded. As many as fit;
+when that's not all, the ones that are over go first and "+n more" counts the
+rest. Users without a connected Apple calendar get "Connect your Apple
+calendar in Calendar."; the tile opens Calendar. Set by `VITE_CALENDAR_URL`
+in `.env.production`; in `npm run dev` the tile shows mock events. No role
+needed. Calendar lists `https://portal.teaz.pro` in
+`calendar.cors.allowed-origins`. Data in `data/calendarToday.ts`, tile in
+`components/dashboard/CalendarTile.vue`.
+
 ## Auth
 
 - Frontend `frontend/src/auth/`: Keycloak (`.env.production`: `auth.teaz.pro`,

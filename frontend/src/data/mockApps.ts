@@ -1,4 +1,5 @@
-import type { AgendaEvent, AppStat, ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
+import type { AppStat, ProgressRow, StatusRow } from '@teeetime/teaz-pro-ui'
+import type { CalendarToday } from '@/data/calendarToday'
 import type { FitnessLatestRun, FitnessWeekly } from '@/data/fitnessRuns'
 import type { TransitBoard } from '@/data/transitBoard'
 
@@ -17,9 +18,9 @@ export interface EcosystemApp {
    * is a preview of the kind of richer content a real app might surface on
    * its dashboard tile — still presentational only, no logic/fetching.
    */
-  variant?: 'stat' | 'agenda' | 'form' | 'search' | 'status' | 'progress' | 'transit' | 'fitness-latest' | 'fitness-weekly'
+  variant?: 'stat' | 'calendar' | 'form' | 'search' | 'status' | 'progress' | 'transit' | 'fitness-latest' | 'fitness-weekly'
   stat?: AppStat
-  events?: AgendaEvent[]
+  calendar?: CalendarToday
   statuses?: StatusRow[]
   progress?: ProgressRow[]
   transit?: TransitBoard
@@ -44,7 +45,7 @@ export interface EcosystemApp {
  *
  *   row 1  Latest run | Weekly km (2x2) . | Study     | Status (1x2)
  *   row 2  Inventory  | .               . | Transit   | .
- *   row 3  Analytics (2x2)  . | CRM       | Scheduler (2x1)   .
+ *   row 3  Analytics (2x2)  . | CRM       | Calendar (2x1)    .
  *   row 4  .                . | Docs      | Messaging | Reports (1x2)
  *   row 5  File Vault | Admin | Settings  | Search    | .
  *
@@ -180,18 +181,29 @@ export const mockApps: EcosystemApp[] = [
     },
   },
   { id: 'crm', name: 'CRM', description: 'Customer relationships and leads.', icon: 'person', href: '#' },
+  /*
+   * Third row, fourth and fifth column (2x1). Live from Calendar's
+   * /api/events/today in builds (see calendarToday.ts); this mock data only
+   * shows in npm run dev.
+   */
   {
-    id: 'scheduler',
-    name: 'Scheduler',
-    description: 'Shared calendars and bookings.',
+    id: 'calendar',
+    name: 'Calendar',
+    description: 'Your events today.',
     icon: 'calendar',
-    href: '#',
+    href: 'https://calendar.teaz.pro',
     colSpan: 2,
-    variant: 'agenda',
-    events: [
-      { time: '10:00', title: 'Team sync' },
-      { time: '14:30', title: 'Client call' },
-    ],
+    variant: 'calendar',
+    calendar: {
+      date: 'Fri 23 Oct',
+      events: [
+        { key: '1', title: 'Team offsite', allDay: true, time: '', color: '#f59e0b', start: 0, end: 1440 },
+        { key: '2', title: 'Standup', allDay: false, time: '09:00–09:15', color: '#f59e0b', start: 540, end: 555 },
+        { key: '3', title: 'Retro', allDay: false, time: '15:00–16:00', color: '#f59e0b', start: 900, end: 960 },
+        { key: '4', title: 'Dinner with friends', allDay: false, time: '19:30–22:30', color: '#10b981', start: 1170, end: 1350 },
+      ],
+      emptyText: 'Connect your Apple calendar in Calendar.',
+    },
   },
   { id: 'docs', name: 'Docs', description: 'Internal documentation.', icon: 'docs', href: '#' },
   { id: 'messaging', name: 'Messaging', description: 'Team chat and notifications.', icon: 'chat', href: '#' },

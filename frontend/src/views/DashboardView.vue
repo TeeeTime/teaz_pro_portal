@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  AgendaTile,
   AppTile,
   GridItem,
   GridLayout,
@@ -10,12 +9,14 @@ import {
   StatSparklineTile,
   StatusListTile,
 } from '@teeetime/teaz-pro-ui'
+import CalendarTile from '@/components/dashboard/CalendarTile.vue'
 import FitnessLatestTile from '@/components/dashboard/FitnessLatestTile.vue'
 import FitnessWeeklyTile from '@/components/dashboard/FitnessWeeklyTile.vue'
 import QuickFormTile from '@/components/dashboard/QuickFormTile.vue'
 import TransitTile from '@/components/dashboard/TransitTile.vue'
 import { mockApps } from '@/data/mockApps'
 import type { EcosystemApp } from '@/data/mockApps'
+import { useCalendarToday } from '@/data/calendarToday'
 import { useFitnessTiles } from '@/data/fitnessRuns'
 import { usePulseStatuses } from '@/data/pulseHealth'
 import { useStudyCourses } from '@/data/studyOverview'
@@ -30,6 +31,8 @@ const studyCourses = useStudyCourses('study-user')
 const transitBoard = useTransitBoard()
 // Live from Fitness in builds; null in dev.
 const fitness = useFitnessTiles()
+// Live from Calendar in builds; null in dev.
+const calendarToday = useCalendarToday()
 
 const auth = useAuth()
 
@@ -74,7 +77,12 @@ function openApp(href: string) {
       >
         <NoAccessTile v-if="locked(app)" :icon="app.icon" :name="app.name" />
         <StatSparklineTile v-else-if="app.variant === 'stat' && app.stat" :icon="app.icon" :name="app.name" :description="app.description" :stat="app.stat" />
-        <AgendaTile v-else-if="app.variant === 'agenda' && app.events" :icon="app.icon" :name="app.name" :events="app.events" />
+        <CalendarTile
+          v-else-if="app.variant === 'calendar' && app.calendar"
+          :icon="app.icon"
+          :name="app.name"
+          :today="calendarToday ?? app.calendar"
+        />
         <QuickFormTile v-else-if="app.variant === 'form'" :icon="app.icon" :name="app.name" />
         <SearchFieldTile v-else-if="app.variant === 'search'" :icon="app.icon" :name="app.name" placeholder="Search ecosystem…" />
         <StatusListTile v-else-if="app.variant === 'status' && app.statuses" :icon="app.icon" :name="app.name" :statuses="pulseStatuses ?? app.statuses" />

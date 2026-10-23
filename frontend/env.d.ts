@@ -13,6 +13,8 @@ interface ImportMetaEnv {
   readonly VITE_TRANSIT_URL?: string
   /** Teaz Fitness base URL, e.g. https://fitness.teaz.pro. Unset = mock data in the Fitness tiles. */
   readonly VITE_FITNESS_URL?: string
+  /** Teaz Calendar base URL, e.g. https://calendar.teaz.pro. Unset = mock events in the Calendar tile. */
+  readonly VITE_CALENDAR_URL?: string
 }
 
 interface ImportMeta {
