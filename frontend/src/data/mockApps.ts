@@ -48,7 +48,7 @@ export interface EcosystemApp {
  *   row 1  Time       | Weekly km (2x2) . | Study     | Status (1x2)
  *   row 2  Latest run | .               . | Transit   | .
  *   row 3  Calendar (2x1)              .  | Performance (3x1)  .  .
- *   row 4  Wiki
+ *   row 4  Wiki       | Account
  *
  * Changing the order or a span moves the tiles after it; check the layout.
  */
@@ -233,5 +233,12 @@ export const mockApps: EcosystemApp[] = [
     description: 'Your wikis and pages.',
     icon: 'docs',
     href: 'https://wiki.teaz.pro',
+  },
+  {
+    id: 'account',
+    name: 'Account',
+    description: 'Password, 2FA and profile picture.',
+    icon: 'user',
+    href: 'https://account.teaz.pro',
   },
 ]

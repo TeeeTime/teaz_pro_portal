@@ -13,6 +13,7 @@ export function createMockAuth(): AuthService {
     async init() {
       // Has every role the portal checks, so all tiles stay usable in dev.
       user.value = {
+        id: '00000000-0000-0000-0000-000000000001',
         name: 'Jordan Lee',
         username: 'jlee',
         email: 'jordan.lee@example.com',
