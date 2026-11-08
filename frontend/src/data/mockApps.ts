@@ -48,7 +48,7 @@ export interface EcosystemApp {
  *   row 1  Time       | Weekly km (2x2) . | Study     | Status (1x2)
  *   row 2  Latest run | .               . | Transit   | .
  *   row 3  Calendar (2x1)              .  | Performance (3x1)  .  .
- *   row 4  Wiki       | Account
+ *   row 4  Wiki       | DJ-Cloud   | Account
  *
  * Changing the order or a span moves the tiles after it; check the layout.
  */
@@ -233,6 +233,14 @@ export const mockApps: EcosystemApp[] = [
     description: 'Your wikis and pages.',
     icon: 'docs',
     href: 'https://wiki.teaz.pro',
+  },
+  // Not a Teaz app: a plain link out, no Keycloak, nothing fetched.
+  {
+    id: 'djcloud',
+    name: 'DJ-Cloud',
+    description: 'Your DJ music library.',
+    icon: 'headset',
+    href: 'https://djcloud.cloud',
   },
   {
     id: 'account',
