@@ -30,6 +30,14 @@ release: `npm install github:TeeeTime/teaz_pro_ui#v<version>` in
 `frontend/` (editing the tag and running a plain `npm install` keeps the
 old version from the lock file).
 
+## Phone layout
+
+Below a 700px viewport the dashboard swaps the desktop grid for its own
+phone grid (`DashboardView.vue`): 6 narrow columns and fixed 56px rows, so
+tiles are sized for their content instead of being square. Each tile's
+`phone` entry in `data/mockApps.ts` sets its order and size there (full
+width, half or a third). From 700px up, the desktop grid is unchanged.
+
 ## Status tile
 
 The dashboard's Status tile shows every app's health from Teaz Pulse
