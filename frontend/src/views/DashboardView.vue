@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { AppTile, GridItem, GridLayout, NoAccessTile, ProgressListTile, StatusListTile } from '@teeetime/teaz-pro-ui'
 import CalendarTile from '@/components/dashboard/CalendarTile.vue'
 import FitnessLatestTile from '@/components/dashboard/FitnessLatestTile.vue'
@@ -16,7 +15,6 @@ import { usePulseLoad } from '@/data/pulseLoad'
 import { useStudyCourses } from '@/data/studyOverview'
 import { useTransitBoard } from '@/data/transitBoard'
 import { useAuth } from '@/auth'
-import { useMediaQuery } from '@/composables/useMediaQuery'
 
 // Live from Teaz Pulse in builds; null in dev, where the mock rows stay.
 const pulseStatuses = usePulseStatuses()
@@ -32,34 +30,6 @@ const fitness = useFitnessTiles()
 const calendarToday = useCalendarToday()
 
 const auth = useAuth()
-
-/*
- * Phones get their own grid (see the layout comment in mockApps.ts): the
- * desktop grid's square cells make tiles far too tall at phone width, and
- * its wide tiles don't fit one column. 700px: below it the desktop grid
- * would drop to 2 columns, which its 3-wide Performance tile can't take.
- * Desktop and tablet keep the desktop grid, untouched.
- */
-const phone = useMediaQuery('(max-width: 699px)')
-
-const tiles = computed(() =>
-  phone.value
-    ? mockApps.filter((app) => app.phone).sort((a, b) => a.phone!.order - b.phone!.order)
-    : mockApps,
-)
-
-function colSpan(app: EcosystemApp): number | undefined {
-  return phone.value ? app.phone!.colSpan : app.colSpan
-}
-
-function rowSpan(app: EcosystemApp): number | undefined {
-  return phone.value ? app.phone!.rowSpan : app.rowSpan
-}
-
-/** A small launcher: icon and name only, centered. */
-function compact(app: EcosystemApp): boolean {
-  return phone.value ? app.phone!.colSpan === 2 : (app.colSpan ?? 1) === 1 && (app.rowSpan ?? 1) === 1
-}
 
 function hasRole(app: EcosystemApp): boolean {
   return !app.requiredRole || (auth.user.value?.roles.includes(app.requiredRole) ?? false)
@@ -90,12 +60,15 @@ function openApp(app: EcosystemApp) {
       visible but aren't clickable: a tile without an app behind it (Time)
       and an app with a requiredRole the user lacks.
     -->
-    <component :is="phone ? 'div' : GridLayout" v-bind="phone ? { class: 'dashboard__phone-grid' } : { columns: 5, gap: 16 }">
+    <GridLayout :columns="5" :gap="16" phone :phone-row-height="56">
       <GridItem
-        v-for="app in tiles"
+        v-for="app in mockApps"
         :key="app.id"
-        :col-span="colSpan(app)"
-        :row-span="rowSpan(app)"
+        :col-span="app.colSpan"
+        :row-span="app.rowSpan"
+        :phone-col-span="app.phone?.colSpan"
+        :phone-row-span="app.phone?.rowSpan"
+        :phone-order="app.phone?.order"
         :clickable="canOpen(app)"
         :aria-label="app.name"
         @click="openApp(app)"
@@ -145,10 +118,10 @@ function openApp(app: EcosystemApp) {
           :icon="app.icon"
           :name="app.name"
           :description="app.description"
-          :compact="compact(app)"
+          :compact="(app.colSpan ?? 1) === 1 && (app.rowSpan ?? 1) === 1"
         />
       </GridItem>
-    </component>
+    </GridLayout>
   </div>
 </template>
 
@@ -174,19 +147,8 @@ function openApp(app: EcosystemApp) {
   color: var(--color-text-primary);
 }
 
-/*
- * Phones: 6 narrow columns (tiles span 2, 3 or 6) and fixed 56px rows, so a
- * tile's height is set by its content's needs, not by its width.
- */
-.dashboard__phone-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-auto-rows: 56px;
-  grid-auto-flow: row dense;
-  gap: 12px;
-}
-
-@media (max-width: 699px) {
+/* Phones: the grid's phone mode starts at 640px of grid width, i.e. 688px of viewport. */
+@media (max-width: 688px) {
   .dashboard {
     padding: 20px 16px 40px;
   }

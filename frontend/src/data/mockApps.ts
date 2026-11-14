@@ -9,8 +9,11 @@ export interface PhoneTile {
   order: number
   /** Of 6 columns: 6 full width, 3 half, 2 a third. */
   colSpan: 2 | 3 | 6
-  /** In 56px rows (with 12px gaps): 2 = 124px, 3 = 192px, 4 = 260px. */
-  rowSpan: number
+  /**
+   * In 56px rows (with 12px gaps): 2 = 124px, 3 = 192px, 4 = 260px. 'auto':
+   * as tall as the content (lists that show all their rows).
+   */
+  rowSpan: number | 'auto'
 }
 
 export interface EcosystemApp {
@@ -24,9 +27,9 @@ export interface EcosystemApp {
   colSpan?: number
   rowSpan?: number
   /**
-   * Size and position on phones (see the layout comment above mockApps), where the
-   * dashboard switches to its own grid: 6 narrow columns and 56px rows,
-   * not the square cells of the desktop grid.
+   * Size and position on phones (see the layout comment above mockApps), in
+   * the grid's phone mode: 6 narrow columns and 56px rows, not the square
+   * cells of the desktop grid.
    */
   phone?: PhoneTile
   /**
@@ -67,8 +70,9 @@ export interface EcosystemApp {
  *
  * Changing the order or a span moves the tiles after it; check the layout.
  *
- * On phones (viewport under 700px) the dashboard uses its own grid instead,
- * ordered and sized by each tile's `phone` (6 columns, 56px rows):
+ * On phones (grid up to 640px wide, viewport up to 688px) the grid switches
+ * to its phone mode, ordered and sized by each tile's `phone` (6 columns,
+ * 56px rows; Study and Status as tall as their content):
  *
  *   Time (half)         | Latest run (half)
  *   Weekly km (full)
@@ -142,7 +146,7 @@ export const mockApps: EcosystemApp[] = [
    */
   {
     id: 'study',
-    phone: { order: 6, colSpan: 6, rowSpan: 4 },
+    phone: { order: 6, colSpan: 6, rowSpan: 'auto' },
     name: 'Study',
     description: 'Your courses and learning progress.',
     icon: 'study',
@@ -162,7 +166,7 @@ export const mockApps: EcosystemApp[] = [
    */
   {
     id: 'status',
-    phone: { order: 7, colSpan: 6, rowSpan: 4 },
+    phone: { order: 7, colSpan: 6, rowSpan: 'auto' },
     name: 'Status',
     description: 'Service health and uptime.',
     icon: 'pulse',
