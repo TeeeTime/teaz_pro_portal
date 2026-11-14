@@ -30,6 +30,15 @@ release: `npm install github:TeeeTime/teaz_pro_ui#v<version>` in
 `frontend/` (editing the tag and running a plain `npm install` keeps the
 old version from the lock file).
 
+## Phone layout
+
+On phones (grid up to 640px wide, viewport up to 688px) the dashboard uses
+the phone mode of teaz_pro_ui's `GridLayout` (`phone` prop): 6 narrow
+columns and 56px rows instead of square cells. Each tile's `phone` entry in
+`data/mockApps.ts` sets its order and size there (full width, half or a
+third; a number of rows, or `'auto'` to be as tall as its content). Above
+that, the desktop grid is unchanged.
+
 ## Status tile
 
 The dashboard's Status tile shows every app's health from Teaz Pulse

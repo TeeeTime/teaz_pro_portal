@@ -4,6 +4,18 @@ import type { FitnessLatestRun, FitnessWeekly } from '@/data/fitnessRuns'
 import type { PerformanceLoad } from '@/data/pulseLoad'
 import type { TransitBoard } from '@/data/transitBoard'
 
+export interface PhoneTile {
+  /** Position in the phone grid; tiles are listed in this order there. */
+  order: number
+  /** Of 6 columns: 6 full width, 3 half, 2 a third. */
+  colSpan: 2 | 3 | 6
+  /**
+   * In 56px rows (with 12px gaps): 2 = 124px, 3 = 192px, 4 = 260px. 'auto':
+   * as tall as the content (lists that show all their rows).
+   */
+  rowSpan: number | 'auto'
+}
+
 export interface EcosystemApp {
   id: string
   name: string
@@ -14,6 +26,12 @@ export interface EcosystemApp {
   href?: string
   colSpan?: number
   rowSpan?: number
+  /**
+   * Size and position on phones (see the layout comment above mockApps), in
+   * the grid's phone mode: 6 narrow columns and 56px rows, not the square
+   * cells of the desktop grid.
+   */
+  phone?: PhoneTile
   /**
    * Which widget renders this tile's content. Unset = the default simple
    * launcher (AppTile: icon, name, description). Every variant beyond that
@@ -51,6 +69,19 @@ export interface EcosystemApp {
  *   row 4  Wiki       | DJ-Cloud   | Account
  *
  * Changing the order or a span moves the tiles after it; check the layout.
+ *
+ * On phones (grid up to 640px wide, viewport up to 688px) the grid switches
+ * to its phone mode, ordered and sized by each tile's `phone` (6 columns,
+ * 56px rows; Study and Status as tall as their content):
+ *
+ *   Time (half)         | Latest run (half)
+ *   Weekly km (full)
+ *   Calendar (full)
+ *   Transit (full)
+ *   Study (full)
+ *   Status (full)
+ *   Performance (full)
+ *   Wiki | DJ-Cloud | Account (a third each)
  */
 
 // Twelve Mondays up to the current week, for the Weekly km mock bars.
@@ -79,13 +110,21 @@ const mockLoad = Array.from({ length: 360 }, (_, i) => {
  */
 export const mockApps: EcosystemApp[] = [
   /* The device's own clock, nothing fetched (TimeTile.vue). */
-  { id: 'time', name: 'Time', description: 'The current time.', icon: 'clock', variant: 'time' },
+  {
+    id: 'time',
+    name: 'Time',
+    description: 'The current time.',
+    icon: 'clock',
+    variant: 'time',
+    phone: { order: 1, colSpan: 3, rowSpan: 3 },
+  },
   /*
    * Live from Fitness's /api/runs/latest and /api/runs/weekly in builds (see
    * fitnessRuns.ts); this mock data only shows in npm run dev.
    */
   {
     id: 'fitness-weekly',
+    phone: { order: 3, colSpan: 6, rowSpan: 4 },
     name: 'Weekly km',
     description: 'Kilometers per week from Strava.',
     icon: 'run',
@@ -107,6 +146,7 @@ export const mockApps: EcosystemApp[] = [
    */
   {
     id: 'study',
+    phone: { order: 6, colSpan: 6, rowSpan: 'auto' },
     name: 'Study',
     description: 'Your courses and learning progress.',
     icon: 'study',
@@ -126,6 +166,7 @@ export const mockApps: EcosystemApp[] = [
    */
   {
     id: 'status',
+    phone: { order: 7, colSpan: 6, rowSpan: 'auto' },
     name: 'Status',
     description: 'Service health and uptime.',
     icon: 'pulse',
@@ -145,6 +186,7 @@ export const mockApps: EcosystemApp[] = [
   // Second row, first column, below Time.
   {
     id: 'fitness-latest',
+    phone: { order: 2, colSpan: 3, rowSpan: 3 },
     name: 'Latest run',
     description: 'Your latest run from Strava.',
     icon: 'run',
@@ -162,6 +204,7 @@ export const mockApps: EcosystemApp[] = [
    */
   {
     id: 'transit',
+    phone: { order: 5, colSpan: 6, rowSpan: 4 },
     name: 'Transit',
     description: 'Next departures at your stop.',
     icon: 'calendar',
@@ -187,6 +230,7 @@ export const mockApps: EcosystemApp[] = [
    */
   {
     id: 'calendar',
+    phone: { order: 4, colSpan: 6, rowSpan: 4 },
     name: 'Calendar',
     description: 'Your events today.',
     icon: 'calendar',
@@ -210,6 +254,7 @@ export const mockApps: EcosystemApp[] = [
    */
   {
     id: 'performance',
+    phone: { order: 8, colSpan: 6, rowSpan: 4 },
     name: 'Performance',
     description: 'CPU and memory of the server.',
     icon: 'analytics',
@@ -229,6 +274,7 @@ export const mockApps: EcosystemApp[] = [
   // Fourth row, first column. A plain launcher, nothing fetched.
   {
     id: 'wiki',
+    phone: { order: 9, colSpan: 2, rowSpan: 2 },
     name: 'Wiki',
     description: 'Your wikis and pages.',
     icon: 'docs',
@@ -237,6 +283,7 @@ export const mockApps: EcosystemApp[] = [
   // Not a Teaz app: a plain link out, no Keycloak, nothing fetched.
   {
     id: 'djcloud',
+    phone: { order: 10, colSpan: 2, rowSpan: 2 },
     name: 'DJ-Cloud',
     description: 'Your DJ music library.',
     icon: 'headset',
@@ -244,6 +291,7 @@ export const mockApps: EcosystemApp[] = [
   },
   {
     id: 'account',
+    phone: { order: 11, colSpan: 2, rowSpan: 2 },
     name: 'Account',
     description: 'Password, 2FA and profile picture.',
     icon: 'user',

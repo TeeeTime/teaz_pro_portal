@@ -60,12 +60,15 @@ function openApp(app: EcosystemApp) {
       visible but aren't clickable: a tile without an app behind it (Time)
       and an app with a requiredRole the user lacks.
     -->
-    <GridLayout :columns="5" :gap="16">
+    <GridLayout :columns="5" :gap="16" phone :phone-row-height="56">
       <GridItem
         v-for="app in mockApps"
         :key="app.id"
         :col-span="app.colSpan"
         :row-span="app.rowSpan"
+        :phone-col-span="app.phone?.colSpan"
+        :phone-row-span="app.phone?.rowSpan"
+        :phone-order="app.phone?.order"
         :clickable="canOpen(app)"
         :aria-label="app.name"
         @click="openApp(app)"
@@ -142,5 +145,20 @@ function openApp(app: EcosystemApp) {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text-primary);
+}
+
+/* Phones: the grid's phone mode starts at 640px of grid width, i.e. 688px of viewport. */
+@media (max-width: 688px) {
+  .dashboard {
+    padding: 20px 16px 40px;
+  }
+
+  .dashboard__header {
+    margin-bottom: 16px;
+  }
+
+  .dashboard__title {
+    font-size: 1.25rem;
+  }
 }
 </style>
